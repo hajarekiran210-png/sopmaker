@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Process SOP Maker | Turn Every Process Into a Repeatable System</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* ==========================================================================
+           CSS VARIABLES & DESIGN SYSTEM
+           ========================================================================== */
+        :root {
+            --primary: #4F46E5;
+            --primary-dark: #4338CA;
+            --primary-light: #EEF2FF;
+            --secondary: #7C3AED;
+            --success: #22C55E;
+            --success-light: #DCFCE7;
+            --warning: #F59E0B;
+            --warning-light: #FEF3C7;
+            --danger: #EF4444;
+            --danger-light: #FEE2E2;
+            --info: #0EA5E9;
+            
+            --dark: #0F172A;
+            --bg-body: #F8FAFC;
+            --surface: #FFFFFF;
+            
+            --border: #E2E8F0;
+            --text-primary: #1E293B;
+            --text-secondary: #64748B;
+            --muted: #94A3B8;
+            
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-full: 9999px;
+            
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            
+            --sidebar-width: 260px;
+            --header-height: 64px;
+            --transition: all 0.2s ease-in-out;
+            --font-family: 'Inter', sans-serif;
+        }
+
+        .dark-mode {
+            --bg-body: #0F172A;
+            --surface: #1E293B;
+            --border: #334155;
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --dark: #020617;
+            --primary-light: #312E81;
+        }
+
+        /* ==========================================================================
+           RESET & TYPOGRAPHY
+           ========================================================================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            line-height: 1.5;
+            font-size: 14px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        h1, h2, h3, h4, h5, h6 { color: var(--text-primary); font-weight: 600; margin-bottom: 0.5rem; }
+        h1 { font-size: 2rem; } h2 { font-size: 1.5rem; } h3 { font-size: 1.25rem; }
+        p { margin-bottom: 1rem; color: var(--text-secondary); }
+        a { color: var(--primary); text-decoration: none; transition: var(--transition); }
+        a:hover { color: var(--primary-dark); }
+        ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; color: var(--text-secondary); }
+
+        /* ==========================================================================
+           LAYOUT & UTILITIES
+           ========================================================================== */
+        .app-container { display: flex; height: 100vh; overflow: hidden; }
+        
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--dark);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+            z-index: 100;
+        }
+        .sidebar-brand {
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            padding: 0 1.5rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-brand svg { margin-right: 0.5rem; color: var(--primary); }
+        .sidebar-nav { flex: 1; overflow-y: auto; padding: 1rem 0; }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: #CBD5E1;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        .nav-item svg { margin-right: 0.75rem; width: 18px; height: 18px; }
+        .nav-item:hover, .nav-item.active {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            border-left: 3px solid var(--primary);
+        }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .top-header {
+            height: var(--header-height);
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            z-index: 50;
+        }
+        .header-search { display: flex; align-items: center; background: var(--bg-body); padding: 0.5rem 1rem; border-radius: var(--radius-md); width: 300px; }
+        .header-search input { border: none; background: transparent; outline: none; margin-left: 0.5rem; width: 100%; color: var(--text-primary); }
+        .header-actions { display: flex; align-items: center; gap: 1rem; }
+        .icon-btn { background: none; border: none; cursor: pointer; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; padding: 0.5rem; border-radius: var(--radius-md); transition: var(--transition); }
+        .icon-btn:hover { background-color: var(--bg-body); color: var(--text-primary); }
+        
+        .page-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        .flex { display: flex; }
+        .flex-col { display: flex; flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; }
+        .justify-end { justify-content: flex-end; }
+        .gap-1 { gap: 0.5rem; }
+        .gap-2 { gap: 1rem; }
+        .gap-4 { gap: 2rem; }
+        .grid { display: grid; }
+        .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+        .grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+        .mt-1 { margin-top: 0.5rem; } .mt-2 { margin-top: 1rem; } .mt-4 { margin-top: 2rem; }
+        .mb-2 { margin-bottom: 1rem; } .mb-4 { margin-bottom: 2rem; }
+        .w-full { width: 100%; }
+        .text-center { text-align: center; }
+        .text-sm { font-size: 0.875rem; }
+        .text-muted { color: var(--muted); }
+
+        /* ==========================================================================
+           COMPONENTS
+           ========================================================================== */
+        .card {
+            background-color: var(--surface);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 0.5rem 1rem; font-weight: 500; border-radius: var(--radius-md);
+            cursor: pointer; transition: var(--transition); border: 1px solid transparent;
+            font-size: 0.875rem; gap: 0.5rem;
+        }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-primary:hover { background-color: var(--primary-dark); }
+        .btn-secondary { background-color: var(--surface); border-color: var(--border); color: var(--text-primary); }
+        .btn-secondary:hover { background-color: var(--bg-body); }
+        .btn-danger { background-color: var(--danger); color: white; }
+        .btn-danger:hover { background-color: #DC2626; }
+        .btn-success { background-color: var(--success); color: white; }
+        
+        /* Forms */
+        .form-group { margin-bottom: 1.25rem; }
+        .form-label { display: block; font-weight: 500; margin-bottom: 0.5rem; color: var(--text-primary); font-size: 0.875rem; }
+        .form-control {
+            width: 100%; padding: 0.6rem 0.75rem; border: 1px solid var(--border);
+            border-radius: var(--radius-md); font-family: var(--font-family);
+            background-color: var(--surface); color: var(--text-primary); transition: var(--transition);
+        }
+        .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+        textarea.form-control { resize: vertical; min-height: 100px; }
+
+        /* Badges */
+        .badge {
+            display: inline-block; padding: 0.25rem 0.6rem; border-radius: var(--radius-full);
+            font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .badge-success { background-color: var(--success-light); color: #166534; }
+        .badge-warning { background-color: var(--warning-light); color: #92400E; }
+        .badge-danger { background-color: var(--danger-light); color: #991B1B; }
+        .badge-primary { background-color: var(--primary-light); color: var(--primary-dark); }
+        .badge-info { background-color: #E0F2FE; color: #0369A1; }
+        
+        /* Tables */
+        .table-container { overflow-x: auto; margin-top: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; background-color: var(--surface); }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background-color: var(--bg-body); font-weight: 600; color: var(--text-secondary); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; }
+        tr:hover td { background-color: var(--bg-body); }
+        tr:last-child td { border-bottom: none; }
+
+        /* Toasts */
+        .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast {
+            min-width: 300px; padding: 1rem; border-radius: var(--radius-md);
+            background: white; box-shadow: var(--shadow-lg); border-left: 4px solid var(--primary);
+            display: flex; align-items: start; gap: 10px; transform: translateX(120%);
+            animation: slideIn 0.3s forwards; color: var(--text-primary);
+        }
+        .toast.success { border-color: var(--success); }
+        .toast.warning { border-color: var(--warning); }
+        .toast.error { border-color: var(--danger); }
+        .toast-icon { flex-shrink: 0; }
+        .toast.success .toast-icon { color: var(--success); }
+        .toast.warning .toast-icon { color: var(--warning); }
+        .toast.error .toast-icon { color: var(--danger); }
+        .toast-title { font-weight: 600; font-size: 0.875rem; margin-bottom: 0.25rem; }
+        .toast-msg { font-size: 0.875rem; color: var(--text-secondary); }
+        @keyframes slideIn { to { transform: translateX(0); } }
+        @keyframes slideOut { to { transform: translateX(120%); opacity: 0; } }
+
+        /* Wizards & Editor */
+        .wizard-progress { display: flex; justify-content: space-between; margin-bottom: 2rem; position: relative; }
+        .wizard-progress::before { content: ''; position: absolute; top: 15px; left: 0; right: 0; height: 2px; background: var(--border); z-index: 1; }
+        .wizard-step-indicator { display: flex; flex-direction: column; align-items: center; z-index: 2; width: 100px; }
+        .step-circle { width: 32px; height: 32px; border-radius: 50%; background: var(--surface); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem; transition: var(--transition); }
+        .wizard-step-indicator.active .step-circle { border-color: var(--primary); background: var(--primary); color: white; }
+        .wizard-step-indicator.completed .step-circle { border-color: var(--success); background: var(--success); color: white; }
+        .step-label { font-size: 0.75rem; font-weight: 500; text-align: center; color: var(--text-secondary); }
+        .wizard-step-indicator.active .step-label { color: var(--primary); }
+        
+        .wizard-content { display: none; }
+        .wizard-content.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .editor-layout { display: grid; grid-template-columns: 1fr 300px; gap: 2rem; height: 100%; }
+        .editor-main { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); display: flex; flex-direction: column; }
+        .editor-toolbar { padding: 1rem; border-bottom: 1px solid var(--border); background: var(--bg-body); display: flex; gap: 0.5rem; align-items: center; border-radius: var(--radius-md) var(--radius-md) 0 0; }
+        .editor-content { padding: 2rem; flex: 1; overflow-y: auto; outline: none; }
+        .ai-sidebar { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1rem; }
+        
+        /* Modals */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: none; align-items: center; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: var(--surface); width: 100%; max-width: 500px; border-radius: var(--radius-md); box-shadow: var(--shadow-lg); display: flex; flex-direction: column; max-height: 90vh; }
+        .modal-header { padding: 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 1.5rem; overflow-y: auto; }
+        .modal-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 1rem; background: var(--bg-body); border-radius: 0 0 var(--radius-md) var(--radius-md); }
+
+        .demo-badge { background: linear-gradient(45deg, #7C3AED, #4F46E5); color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; vertical-align: top; margin-left: 4px; }
+
+        /* Public Landing & Auth */
+        .landing-header { background: var(--surface); padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+        .landing-hero { text-align: center; padding: 6rem 1rem; background: linear-gradient(135deg, var(--bg-body) 0%, #E0E7FF 100%); }
+        .landing-hero h1 { font-size: 3rem; color: var(--dark); max-width: 800px; margin: 0 auto 1.5rem; }
+        .landing-hero p { font-size: 1.25rem; max-width: 600px; margin: 0 auto 2rem; }
+        .landing-section { padding: 5rem 5%; }
+        
+        .auth-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg-body); }
+        .auth-card { width: 100%; max-width: 400px; padding: 2rem; }
+        
+        /* Print Styles */
+        @media print {
+            body { background: white; color: black; }
+            .sidebar, .top-header, .btn, .ai-sidebar, .toast-container, .modal-overlay { display: none !important; }
+            .app-container { height: auto; overflow: visible; }
+            .main-content { margin: 0; padding: 0; overflow: visible; }
+            .page-content { padding: 0; }
+            .card { border: none; box-shadow: none; padding: 0; }
+            .editor-layout { display: block; }
+            .editor-main { border: none; box-shadow: none; }
+            .editor-content { padding: 0; }
+            @page { margin: 2cm; }
+            h1, h2, h3 { page-break-after: avoid; }
+            table, img { page-break-inside: avoid; }
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .editor-layout { grid-template-columns: 1fr; }
+            .grid-cols-4 { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); position: fixed; height: 100vh; }
+            .sidebar.open { transform: translateX(0); }
+            .grid-cols-2, .grid-cols-3 { grid-template-columns: 1fr; }
+            .wizard-step-indicator .step-label { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main Mount Point -->
+    <div id="app"></div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- ==========================================================================
+         HTML TEMPLATES (Views)
+         ========================================================================== -->
+
+    <!-- Template: Landing Page -->
+    <template id="tmpl-landing">
+        <header class="landing-header">
+            <div class="flex items-center gap-1 font-bold text-lg">
+                <i data-lucide="layers" style="color:var(--primary)"></i> SOP Maker
+            </div>
+            <nav class="flex gap-4 items-center">
+                <a href="#features" class="text-text-secondary">Features</a>
+                <a href="#pricing" class="text-text-secondary">Pricing</a>
+                <a href="#login" class="text-primary font-medium">Login</a>
+                <a href="#register" class="btn btn-primary">Get Started</a>
+            </nav>
+        </header>
+        <section class="landing-hero">
+            <h1>Create Professional Business SOPs in Minutes</h1>
+            <p>Answer simple questions about your process and turn business knowledge into a clear, repeatable Standard Operating Procedure.</p>
+            <div class="flex justify-center gap-2">
+                <a href="#register" class="btn btn-primary" style="padding: 1rem 2rem; font-size: 1.1rem;">Create Your First SOP</a>
+                <a href="#login" class="btn btn-secondary" style="padding: 1rem 2rem; font-size: 1.1rem;">View Demo</a>
+            </div>
+        </section>
+        <section id="features" class="landing-section" style="background: white;">
+            <div class="text-center mb-4">
+                <h2>Convert Business Knowledge Into Repeatable Systems</h2>
+                <p>Your business should not depend on one person. Document it easily.</p>
+            </div>
+            <div class="grid grid-cols-3 gap-4 max-w-6xl mx-auto" style="max-width: 1000px; margin: 0 auto;">
+                <div class="card text-center">
+                    <i data-lucide="wand-2" class="mb-2" style="width: 32px; height: 32px; color: var(--primary);"></i>
+                    <h3>Guided SOP Builder</h3>
+                    <p class="text-sm">Stop staring at a blank page. Our wizard asks you the right questions.</p>
+                </div>
+                <div class="card text-center">
+                    <i data-lucide="cpu" class="mb-2" style="width: 32px; height: 32px; color: var(--primary);"></i>
+                    <h3>Rule-Based Generator</h3>
+                    <p class="text-sm">Automatically structures your answers into a professional document.</p>
+                </div>
+                <div class="card text-center">
+                    <i data-lucide="users" class="mb-2" style="width: 32px; height: 32px; color: var(--primary);"></i>
+                    <h3>Team Approvals</h3>
+                    <p class="text-sm">Simulated workflows to review, approve and publish procedures.</p>
+                </div>
+            </div>
+        </section>
+        <footer class="landing-header" style="justify-content: center; padding: 2rem;">
+            <p class="text-sm text-muted">© 2026 Business Process SOP Maker Prototype. All rights reserved.</p>
+        </footer>
+    </template>
+
+    <!-- Template: Login -->
+    <template id="tmpl-login">
+        <div class="auth-container">
+            <div class="card auth-card">
+                <div class="text-center mb-4">
+                    <i data-lucide="layers" style="width: 40px; height: 40px; color: var(--primary); margin: 0 auto;"></i>
+                    <h2 class="mt-2">Welcome Back</h2>
+                    <p class="text-sm text-muted">Login to your dashboard</p>
+                </div>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" id="login-email" class="form-control" value="demo@sopmaker.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" id="login-password" class="form-control" value="demo123" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-full justify-center mb-2">Login</button>
+                    <button type="button" class="btn btn-secondary w-full justify-center" onclick="App.ui.showToast('Google Login is simulated in this frontend prototype.', 'info')">
+                        <i data-lucide="chrome"></i> Continue with Google <span class="demo-badge">Demo</span>
+                    </button>
+                </form>
+                <p class="text-center mt-4 text-sm">Don't have an account? <a href="#register">Register</a></p>
+                <div class="mt-4 p-2 bg-blue-50 text-xs text-center" style="background: var(--info); color: white; border-radius: var(--radius-sm);">
+                    Demo Credentials:<br>demo@sopmaker.com / demo123
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Template: Register -->
+    <template id="tmpl-register">
+        <div class="auth-container">
+            <div class="card auth-card">
+                <div class="text-center mb-4">
+                    <h2>Create Account</h2>
+                    <p class="text-sm text-muted">Start documenting your processes</p>
+                </div>
+                <form id="register-form">
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" id="reg-name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Business Email</label>
+                        <input type="email" id="reg-email" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" id="reg-password" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-full justify-center mb-2">Create Account</button>
+                </form>
+                <p class="text-center mt-2 text-xs text-muted">This is a frontend prototype. Production auth requires a backend.</p>
+                <p class="text-center mt-4 text-sm">Already have an account? <a href="#login">Login</a></p>
+            </div>
+        </div>
+    </template>
+
+    <!-- Template: App Layout Shell (Sidebar & Header) -->
+    <template id="tmpl-app-shell">
+        <div class="app-container">
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-brand">
+                    <i data-lucide="layers"></i> SOP Maker
+                </div>
+                <nav class="sidebar-nav">
+                    <a href="#dashboard" class="nav-item" data-path="dashboard"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+                    <a href="#my-sops" class="nav-item" data-path="my-sops"><i data-lucide="file-text"></i> My SOPs</a>
+                    <a href="#create-sop" class="nav-item" data-path="create-sop"><i data-lucide="plus-circle"></i> Create SOP</a>
+                    <a href="#approvals" class="nav-item" data-path="approvals"><i data-lucide="check-square"></i> Approvals</a>
+                    <a href="#templates" class="nav-item" data-path="templates"><i data-lucide="library"></i> Templates</a>
+                    <a href="#departments" class="nav-item" data-path="departments"><i data-lucide="building-2"></i> Departments</a>
+                    <a href="#team" class="nav-item" data-path="team"><i data-lucide="users"></i> Team</a>
+                    <a href="#analytics" class="nav-item" data-path="analytics"><i data-lucide="pie-chart"></i> Analytics</a>
+                    <a href="#settings" class="nav-item" data-path="settings"><i data-lucide="settings"></i> Settings</a>
+                </nav>
+            </aside>
+            <main class="main-content">
+                <header class="top-header">
+                    <div class="flex items-center gap-2">
+                        <button class="icon-btn" id="mobile-menu-btn" style="display:none;"><i data-lucide="menu"></i></button>
+                        <h2 id="page-title" class="m-0" style="margin:0; font-size:1.25rem;">Dashboard</h2>
+                    </div>
+                    <div class="header-actions">
+                        <button class="icon-btn" onclick="App.ui.toggleDarkMode()"><i data-lucide="moon"></i></button>
+                        <button class="icon-btn" onclick="App.ui.showToast('Simulated Notifications', 'info')"><i data-lucide="bell"></i></button>
+                        <div class="flex items-center gap-1 cursor-pointer" onclick="App.auth.logout()">
+                            <div style="width:32px; height:32px; background:var(--primary); color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold;">
+                                <span id="user-initials">KH</span>
+                            </div>
+                            <span class="text-sm font-medium ml-1">Logout</span>
+                        </div>
+                    </div>
+                </header>
+                <div class="page-content" id="page-content">
+                    <!-- Dynamic View Content Injected Here -->
+                </div>
+            </main>
+        </div>
+    </template>
+
+    <!-- Template: Dashboard -->
+    <template id="tmpl-dashboard">
+        <div class="grid grid-cols-4 gap-2 mb-4">
+            <div class="card flex items-center gap-2">
+                <div style="padding:1rem; background:var(--primary-light); border-radius:var(--radius-md); color:var(--primary);">
+                    <i data-lucide="file-text"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-muted m-0" style="margin:0">Total SOPs</p>
+                    <h2 class="m-0" id="dash-total-sops" style="margin:0">0</h2>
+                </div>
+            </div>
+            <div class="card flex items-center gap-2">
+                <div style="padding:1rem; background:var(--success-light); border-radius:var(--radius-md); color:var(--success);">
+                    <i data-lucide="check-circle"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-muted m-0" style="margin:0">Published</p>
+                    <h2 class="m-0" id="dash-published-sops" style="margin:0">0</h2>
+                </div>
+            </div>
+            <div class="card flex items-center gap-2">
+                <div style="padding:1rem; background:var(--warning-light); border-radius:var(--radius-md); color:var(--warning);">
+                    <i data-lucide="clock"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-muted m-0" style="margin:0">Pending Approval</p>
+                    <h2 class="m-0" id="dash-pending-sops" style="margin:0">0</h2>
+                </div>
+            </div>
+            <div class="card flex items-center gap-2">
+                <div style="padding:1rem; background:var(--info); color:white; border-radius:var(--radius-md);">
+                    <i data-lucide="users"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-muted m-0" style="margin:0">Team Members</p>
+                    <h2 class="m-0" id="dash-team-count" style="margin:0">0</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 mb-4">
+            <div class="card">
+                <h3>SOPs by Department</h3>
+                <canvas id="chart-departments" height="200"></canvas>
+            </div>
+            <div class="card">
+                <h3>SOP Status Distribution</h3>
+                <canvas id="chart-status" height="200"></canvas>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="flex justify-between items-center mb-2">
+                <h3>Recently Updated SOPs</h3>
+                <a href="#my-sops" class="btn btn-secondary text-sm">View All</a>
+            </div>
+            <div class="table-container">
+                <table id="dash-sops-table">
+                    <thead><tr><th>ID</th><th>Title</th><th>Department</th><th>Status</th><th>Last Updated</th></tr></thead>
+                    <tbody><!-- Populated via JS --></tbody>
+                </table>
+            </div>
+        </div>
+    </template>
+
+    <!-- Template: My SOPs -->
+    <template id="tmpl-my-sops">
+        <div class="flex justify-between items-center mb-4">
+            <div class="header-search">
+                <i data-lucide="search" class="text-muted"></i>
+                <input type="text" id="search-sops" placeholder="Search SOPs...">
+            </div>
+            <a href="#create-sop" class="btn btn-primary"><i data-lucide="plus"></i> New SOP</a>
+        </div>
+        <div class="card table-container">
+            <table id="sops-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Department</th>
+                        <th>Status</th>
+                        <th>Version</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody><!-- JS injected --></tbody>
+            </table>
+        </div>
+    </template>
+
+    <!-- Template: Create SOP Wizard -->
+    <template id="tmpl-create-sop">
+        <div class="card max-w-4xl mx-auto" style="max-width: 800px; margin: 0 auto;">
+            <div class="wizard-progress" id="wizard-progress">
+                <!-- Steps generated via JS -->
+            </div>
+            
+            <form id="wizard-form">
+                <!-- Step 1: Basic Info -->
+                <div class="wizard-content active" id="step-1">
+                    <h3>Basic Information</h3>
+                    <p class="text-sm text-muted mb-4">Define the core details of this Standard Operating Procedure.</p>
+                    <div class="form-group">
+                        <label class="form-label">SOP Title *</label>
+                        <input type="text" id="wiz-title" class="form-control" required placeholder="e.g., Lead Qualification Process">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="form-group">
+                            <label class="form-label">Department *</label>
+                            <select id="wiz-dept" class="form-control" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Process Owner</label>
+                            <select id="wiz-owner" class="form-control"></select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Purpose of this SOP</label>
+                        <textarea id="wiz-purpose" class="form-control" placeholder="Why does this process exist?"></textarea>
+                    </div>
+                </div>
+
+                <!-- Step 2: Trigger & Outcome -->
+                <div class="wizard-content" id="step-2">
+                    <h3>Trigger and Outcome</h3>
+                    <div class="form-group">
+                        <label class="form-label">What starts this process? (Trigger)</label>
+                        <input type="text" id="wiz-trigger" class="form-control" placeholder="e.g., A new lead fills out the website contact form">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Required Inputs</label>
+                        <input type="text" id="wiz-inputs" class="form-control" placeholder="e.g., Customer Name, Email, Phone Number">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Expected Final Result</label>
+                        <input type="text" id="wiz-outcome" class="form-control" placeholder="e.g., Lead is categorized and added to the CRM">
+                    </div>
+                </div>
+
+                <!-- Step 3: Steps -->
+                <div class="wizard-content" id="step-3">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3>Process Steps</h3>
+                        <button type="button" class="btn btn-secondary text-sm" onclick="App.wizard.addStep()"><i data-lucide="plus"></i> Add Step</button>
+                    </div>
+                    <p class="text-sm text-muted mb-4">Break down the process into actionable steps.</p>
+                    <div id="wiz-steps-container" class="flex-col gap-2">
+                        <!-- Steps injected here -->
+                    </div>
+                </div>
+
+                <!-- Step 4: Review & Generate -->
+                <div class="wizard-content" id="step-4">
+                    <h3>Review & Generate</h3>
+                    <p class="text-sm text-muted mb-4">Our rule-based generator will construct a professional SOP document from your inputs.</p>
+                    <div class="card bg-gray-50 mb-4" style="background: var(--bg-body);">
+                        <ul id="wiz-summary" style="margin:0; list-style:none; padding:0;"></ul>
+                    </div>
+                    <div class="flex items-center gap-2 text-warning mb-4" style="background: var(--warning-light); padding: 1rem; border-radius: var(--radius-md);">
+                        <i data-lucide="cpu"></i>
+                        <span class="text-sm">Clicking Generate will use predefined JavaScript rules to structure your document. No real AI is used in this prototype. <span class="demo-badge">Demo</span></span>
+                    </div>
+                </div>
+
+                <div class="flex justify-between mt-4 pt-4" style="border-top: 1px solid var(--border);">
+                    <button type="button" class="btn btn-secondary" id="wiz-prev" onclick="App.wizard.prevStep()" style="display:none;">Back</button>
+                    <div style="flex:1"></div>
+                    <button type="button" class="btn btn-primary" id="wiz-next" onclick="App.wizard.nextStep()">Next Step</button>
+                    <button type="button" class="btn btn-success" id="wiz-generate" onclick="App.wizard.generateSOP()" style="display:none;"><i data-lucide="wand-2"></i> Generate SOP</button>
+                </div>
+            </form>
+        </div>
+    </template>
+
+    <!-- Template: SOP Editor -->
+    <template id="tmpl-editor">
+        <div class="editor-layout">
+            <div class="editor-main">
+                <div class="editor-toolbar justify-between">
+                    <div class="flex gap-1">
+                        <button class="btn btn-secondary text-sm" onclick="App.editor.execCmd('bold')"><b>B</b></button>
+                        <button class="btn btn-secondary text-sm" onclick="App.editor.execCmd('italic')"><i>I</i></button>
+                        <button class="btn btn-secondary text-sm" onclick="App.editor.execCmd('insertUnorderedList')"><i data-lucide="list"></i></button>
+                    </div>
+                    <div class="flex gap-1">
+                        <button class="btn btn-secondary text-sm" onclick="window.print()"><i data-lucide="printer"></i> Print / Save PDF</button>
+                        <button class="btn btn-success text-sm" onclick="App.editor.saveSOP()"><i data-lucide="save"></i> Save Draft</button>
+                    </div>
+                </div>
+                <!-- Editable area -->
+                <div class="editor-content" id="editor-canvas" contenteditable="true">
+                    <!-- SOP HTML injected here -->
+                </div>
+            </div>
+            <div class="ai-sidebar flex-col gap-2 print-hide">
+                <h3>SOP Details</h3>
+                <div class="text-sm mb-2">
+                    <strong>Status:</strong> <span id="editor-status" class="badge badge-warning">Draft</span><br>
+                    <strong>ID:</strong> <span id="editor-id">SOP-...</span><br>
+                    <strong>Version:</strong> <span id="editor-version">1.0</span>
+                </div>
+                <button class="btn btn-primary w-full justify-center" onclick="App.editor.submitApproval()">Submit for Approval</button>
+                
+                <hr style="border:0; border-top: 1px solid var(--border); margin: 1rem 0;">
+                
+                <h3 class="flex items-center gap-1"><i data-lucide="cpu" style="width:16px;"></i> Demo AI Suggestions</h3>
+                <p class="text-xs text-muted mb-2">Generated using predefined JS rules.</p>
+                <button class="btn btn-secondary w-full text-left text-sm mb-1" onclick="App.editor.applyDemoSuggestion('improve')"><i data-lucide="sparkles" style="width:14px;"></i> Improve Instructions</button>
+                <button class="btn btn-secondary w-full text-left text-sm mb-1" onclick="App.editor.applyDemoSuggestion('checklist')"><i data-lucide="list-checks" style="width:14px;"></i> Create Checklist</button>
+                <button class="btn btn-secondary w-full text-left text-sm" onclick="App.editor.applyDemoSuggestion('risks')"><i data-lucide="alert-triangle" style="width:14px;"></i> Add Risks & Exceptions</button>
+            </div>
+        </div>
+    </template>
+
+    <!-- Template: Simple generic view for tables -->
+    <template id="tmpl-generic-table">
+        <div class="flex justify-between items-center mb-4">
+            <h2 id="view-title">Title</h2>
+            <button class="btn btn-primary" id="view-action-btn"><i data-lucide="plus"></i> Add New</button>
+        </div>
+        <div class="card table-container">
+            <table id="generic-table">
+                <thead id="generic-thead"></thead>
+                <tbody id="generic-tbody"></tbody>
+            </table>
+        </div>
+    </template>
+
+
+    <!-- ==========================================================================
+         JAVASCRIPT APPLICATION LOGIC
+         ========================================================================== -->
+    <script>
+        /**
+         * Business Process SOP Maker Prototype
+         * Architecture: SPA entirely contained within one file as per strict system mandates.
+         */
+
+        const STORAGE_KEY_PREFIX = 'sopmaker_';
+        const SCHEMA_VERSION = '1.0.0';
+
+        // --- Core Application Namespace ---
+        const App = {
+            state: {
+                user: null,
+                currentPath: '',
+                data: {}
+            },
+            
+            // --- 1. Storage & Data Management ---
+            storage: {
+                get: (key) => {
+                    try { return JSON.parse(localStorage.getItem(STORAGE_KEY_PREFIX + key)); }
+                    catch { return null; }
+                },
+                set: (key, val) => {
+                    localStorage.setItem(STORAGE_KEY_PREFIX + key, JSON.stringify(val));
+                },
+                initSeedData: () => {
+                    const v = App.storage.get('schema_version');
+                    if (v !== SCHEMA_VERSION) {
+                        console.log("Initializing Seed Data...");
+                        App.storage.set('schema_version', SCHEMA_VERSION);
+                        
+                        // Seed Business
+                        App.storage.set('business', { id: 'bus_001', name: 'GrowthFlow Solutions', owner: 'Kiran Hajare', industry: 'Consulting' });
+                        
+                        // Seed User
+                        App.storage.set('user', { id: 'user_001', fullName: 'Kiran Hajare', email: 'demo@sopmaker.com', role: 'Owner' });
+                        
+                        // Seed Departments
+                        App.storage.set('departments', [
+                            { id: 'dept_sales', name: 'Sales', code: 'SALES', color: '#4F46E5' },
+                            { id: 'dept_hr', name: 'HR', code: 'HR', color: '#22C55E' },
+                            { id: 'dept_ops', name: 'Operations', code: 'OPS', color: '#F59E0B' }
+                        ]);
+
+                        // Seed Team
+                        App.storage.set('team', [
+                            { id: 'team_001', name: 'Kiran Hajare', email: 'demo@sopmaker.com', role: 'Owner', deptId: 'dept_ops' },
+                            { id: 'team_002', name: 'Amit Sharma', email: 'amit@sopmaker.com', role: 'Manager', deptId: 'dept_sales' }
+                        ]);
+
+                        // Seed SOPs
+                        App.storage.set('sops', [
+                            {
+                                id: 'sop_001', sopNumber: 'SOP-SALES-001', title: 'Lead Qualification Process',
+                                departmentId: 'dept_sales', status: 'Published', version: '1.0',
+                                lastUpdated: new Date().toISOString(),
+                                content: `<h2>1. Purpose</h2><p>To define the process of qualifying inbound leads.</p><h2>2. Steps</h2><ol><li>Review lead info in CRM.</li><li>Call lead within 2 hours.</li><li>Ask BANT questions.</li></ol>`
+                            },
+                            {
+                                id: 'sop_002', sopNumber: 'SOP-HR-001', title: 'Employee Onboarding',
+                                departmentId: 'dept_hr', status: 'Draft', version: '0.1',
+                                lastUpdated: new Date().toISOString(),
+                                content: `<h2>1. Purpose</h2><p>Standardize new hire onboarding.</p>`
+                            },
+                            {
+                                id: 'sop_003', sopNumber: 'SOP-OPS-001', title: 'Daily Quality Check',
+                                departmentId: 'dept_ops', status: 'Pending', version: '1.2',
+                                lastUpdated: new Date().toISOString(),
+                                content: `<h2>1. Purpose</h2><p>Ensure product quality before shipping.</p>`
+                            }
+                        ]);
+                    }
+                    // Load into memory
+                    App.state.data = {
+                        sops: App.storage.get('sops') || [],
+                        departments: App.storage.get('departments') || [],
+                        team: App.storage.get('team') || []
+                    };
+                }
+            },
+
+            // --- 2. Utilities & Security ---
+            utils: {
+                escapeHTML: (str) => {
+                    if (!str) return '';
+                    return str.toString().replace(/[&<>'"]/g, 
+                        tag => ({
+                            '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+                        }[tag] || tag)
+                    );
+                },
+                generateId: (prefix) => prefix + '_' + Math.random().toString(36).substr(2, 9),
+                formatDate: (iso) => {
+                    if (!iso) return '-';
+                    const d = new Date(iso);
+                    return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                },
+                getDeptName: (id) => {
+                    const d = App.state.data.departments.find(x => x.id === id);
+                    return d ? d.name : 'Unknown';
+                }
+            },
+
+            // --- 3. UI Components ---
+            ui: {
+                showToast: (msg, type = 'success') => {
+                    const container = document.getElementById('toast-container');
+                    if (!container) return;
+                    const toast = document.createElement('div');
+                    toast.className = `toast ${type}`;
+                    
+                    let icon = 'check-circle';
+                    if(type === 'warning') icon = 'alert-triangle';
+                    if(type === 'error' || type === 'danger') icon = 'x-circle';
+                    if(type === 'info') icon = 'info';
+
+                    toast.innerHTML = `
+                        <div class="toast-icon"><i data-lucide="${icon}"></i></div>
+                        <div>
+                            <div class="toast-title">${type.charAt(0).toUpperCase() + type.slice(1)}</div>
+                            <div class="toast-msg">${App.utils.escapeHTML(msg)}</div>
+                        </div>
+                    `;
+                    container.appendChild(toast);
+                    if(window.lucide) lucide.createIcons({ root: toast });
+                    
+                    setTimeout(() => {
+                        toast.style.animation = 'slideOut 0.3s forwards';
+                        setTimeout(() => toast.remove(), 300);
+                    }, 4000);
+                },
+                toggleDarkMode: () => {
+                    document.body.classList.toggle('dark-mode');
+                    const isDark = document.body.classList.contains('dark-mode');
+                    App.storage.set('dark_mode', isDark);
+                    // Re-render charts if they exist
+                    if(App.charts.instances.dept) App.charts.renderDeptChart();
+                    if(App.charts.instances.status) App.charts.renderStatusChart();
+                },
+                renderIcons: () => {
+                    if(window.lucide) lucide.createIcons();
+                }
+            },
+
+            // --- 4. Auth & Routing ---
+            auth: {
+                check: () => {
+                    App.state.user = App.storage.get('user');
+                    return !!App.state.user;
+                },
+                login: (e) => {
+                    e.preventDefault();
+                    App.storage.set('user', { id: 'user_001', fullName: 'Demo User', email: 'demo@sopmaker.com', role: 'Owner', isDemo: true });
+                    App.ui.showToast('Login successful. Welcome to the prototype.', 'success');
+                    window.location.hash = '#dashboard';
+                },
+                logout: () => {
+                    App.storage.set('user', null);
+                    window.location.hash = '#landing';
+                }
+            },
+            
+            router: {
+                init: () => {
+                    window.addEventListener('hashchange', App.router.handle);
+                    // On initial load
+                    if (!window.location.hash) {
+                        window.location.hash = App.auth.check() ? '#dashboard' : '#landing';
+                    } else {
+                        App.router.handle();
+                    }
+                },
+                handle: () => {
+                    const hash = window.location.hash.slice(1) || 'landing';
+                    const [path, queryString] = hash.split('?');
+                    
+                    // Route protection
+                    const publicRoutes = ['landing', 'login', 'register'];
+                    if (!publicRoutes.includes(path) && !App.auth.check()) {
+                        window.location.hash = '#login';
+                        return;
+                    }
+
+                    const appDiv = document.getElementById('app');
+                    
+                    // Render Layout Shell if needed
+                    if (!publicRoutes.includes(path)) {
+                        if (!document.getElementById('sidebar')) {
+                            appDiv.innerHTML = document.getElementById('tmpl-app-shell').innerHTML;
+                            document.getElementById('user-initials').innerText = 'KH';
+                            
+                            // Apply saved dark mode
+                            if(App.storage.get('dark_mode')) document.body.classList.add('dark-mode');
+                        }
+                        
+                        // Update active nav
+                        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                        const activeNav = document.querySelector(`.nav-item[data-path="${path.split('-')[0]}"]`);
+                        if(activeNav) activeNav.classList.add('active');
+
+                        // Mount View Content
+                        const contentDiv = document.getElementById('page-content');
+                        const tmpl = document.getElementById(`tmpl-${path}`) || document.getElementById('tmpl-generic-table');
+                        if (tmpl) {
+                            contentDiv.innerHTML = tmpl.innerHTML;
+                            // Set Title
+                            const titleEl = document.getElementById('page-title');
+                            if(titleEl) titleEl.innerText = path.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+                            
+                            // Initialize specific view controllers
+                            App.controllers[path] ? App.controllers[path](queryString) : App.controllers.generic(path);
+                        } else {
+                            contentDiv.innerHTML = `<div class="card text-center"><h2 class="text-muted">View Not Found</h2></div>`;
+                        }
+                    } else {
+                        // Public routes (full screen)
+                        const tmpl = document.getElementById(`tmpl-${path}`);
+                        if(tmpl) appDiv.innerHTML = tmpl.innerHTML;
+                        if(path === 'login') document.getElementById('login-form').addEventListener('submit', App.auth.login);
+                        if(path === 'register') {
+                            document.getElementById('register-form').addEventListener('submit', (e) => {
+                                e.preventDefault();
+                                App.ui.showToast('Demo registration successful. No actual data stored.', 'success');
+                                window.location.hash = '#login';
+                            });
+                        }
+                    }
+                    
+                    App.ui.renderIcons();
+                }
+            },
+
+            // --- 5. Chart.js Wrapper ---
+            charts: {
+                instances: { dept: null, status: null },
+                getColors: () => {
+                    const isDark = document.body.classList.contains('dark-mode');
+                    return { text: isDark ? '#94A3B8' : '#64748B', grid: isDark ? '#334155' : '#E2E8F0' };
+                },
+                renderDeptChart: () => {
+                    const ctx = document.getElementById('chart-departments');
+                    if (!ctx) return;
+                    if (App.charts.instances.dept) App.charts.instances.dept.destroy();
+                    
+                    const depts = App.state.data.departments;
+                    const sops = App.state.data.sops;
+                    const data = depts.map(d => sops.filter(s => s.departmentId === d.id).length);
+                    const colors = App.charts.getColors();
+
+                    App.charts.instances.dept = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: depts.map(d => d.name),
+                            datasets: [{ label: 'SOPs', data: data, backgroundColor: '#4F46E5', borderRadius: 4 }]
+                        },
+                        options: {
+                            responsive: true, maintainAspectRatio: false,
+                            scales: {
+                                y: { beginAtZero: true, grid: { color: colors.grid }, ticks: { color: colors.text, stepSize: 1 } },
+                                x: { grid: { display: false }, ticks: { color: colors.text } }
+                            },
+                            plugins: { legend: { display: false } }
+                        }
+                    });
+                },
+                renderStatusChart: () => {
+                    const ctx = document.getElementById('chart-status');
+                    if (!ctx) return;
+                    if (App.charts.instances.status) App.charts.instances.status.destroy();
+                    
+                    const sops = App.state.data.sops;
+                    const counts = { Draft: 0, Pending: 0, Published: 0 };
+                    sops.forEach(s => { if(counts[s.status] !== undefined) counts[s.status]++; });
+                    
+                    App.charts.instances.status = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Draft', 'Pending', 'Published'],
+                            datasets: [{ data: [counts.Draft, counts.Pending, counts.Published], backgroundColor: ['#94A3B8', '#F59E0B', '#22C55E'], borderWidth: 0 }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: App.charts.getColors().text } } }, cutout: '70%' }
+                    });
+                }
+            },
+
+            // --- 6. View Controllers ---
+            controllers: {
+                dashboard: () => {
+                    const sops = App.state.data.sops;
+                    document.getElementById('dash-total-sops').innerText = sops.length;
+                    document.getElementById('dash-published-sops').innerText = sops.filter(s => s.status === 'Published').length;
+                    document.getElementById('dash-pending-sops').innerText = sops.filter(s => s.status === 'Pending').length;
+                    document.getElementById('dash-team-count').innerText = App.state.data.team.length;
+                    
+                    App.charts.renderDeptChart();
+                    App.charts.renderStatusChart();
+
+                    const tbody = document.querySelector('#dash-sops-table tbody');
+                    tbody.innerHTML = sops.slice(0, 5).map(s => `
+                        <tr>
+                            <td><a href="#editor?id=${s.id}"><b>${s.sopNumber || s.id}</b></a></td>
+                            <td>${App.utils.escapeHTML(s.title)}</td>
+                            <td>${App.utils.getDeptName(s.departmentId)}</td>
+                            <td><span class="badge badge-${s.status === 'Published' ? 'success' : (s.status === 'Pending' ? 'warning' : 'primary')}">${s.status}</span></td>
+                            <td class="text-muted text-sm">${App.utils.formatDate(s.lastUpdated)}</td>
+                        </tr>
+                    `).join('');
+                },
+                'my-sops': () => {
+                    const tbody = document.querySelector('#sops-table tbody');
+                    const renderTable = (sopsList) => {
+                        tbody.innerHTML = sopsList.length ? sopsList.map(s => `
+                            <tr>
+                                <td><b>${s.sopNumber || s.id}</b></td>
+                                <td>${App.utils.escapeHTML(s.title)}</td>
+                                <td>${App.utils.getDeptName(s.departmentId)}</td>
+                                <td><span class="badge badge-${s.status === 'Published' ? 'success' : (s.status === 'Pending' ? 'warning' : 'primary')}">${s.status}</span></td>
+                                <td>v${s.version || '1.0'}</td>
+                                <td>
+                                    <a href="#editor?id=${s.id}" class="btn btn-secondary text-sm" style="padding:0.25rem 0.5rem">Edit</a>
+                                </td>
+                            </tr>
+                        `).join('') : '<tr><td colspan="6" class="text-center text-muted">No SOPs found.</td></tr>';
+                    };
+                    renderTable(App.state.data.sops);
+
+                    document.getElementById('search-sops').addEventListener('input', (e) => {
+                        const term = e.target.value.toLowerCase();
+                        const filtered = App.state.data.sops.filter(s => s.title.toLowerCase().includes(term) || (s.sopNumber && s.sopNumber.toLowerCase().includes(term)));
+                        renderTable(filtered);
+                    });
+                },
+                generic: (viewName) => {
+                    document.getElementById('view-title').innerText = viewName.charAt(0).toUpperCase() + viewName.slice(1);
+                    document.getElementById('view-action-btn').onclick = () => App.ui.showToast(`Action simulated for ${viewName}. Requires backend.`, 'info');
+                    
+                    const thead = document.getElementById('generic-thead');
+                    const tbody = document.getElementById('generic-tbody');
+                    
+                    if (viewName === 'departments') {
+                        thead.innerHTML = '<tr><th>Name</th><th>Code</th><th>SOPs Count</th><th>Actions</th></tr>';
+                        tbody.innerHTML = App.state.data.departments.map(d => `
+                            <tr>
+                                <td><div class="flex items-center gap-1"><div style="width:12px;height:12px;border-radius:50%;background:${d.color}"></div> ${d.name}</div></td>
+                                <td>${d.code}</td>
+                                <td>${App.state.data.sops.filter(s => s.departmentId === d.id).length}</td>
+                                <td><button class="btn btn-secondary text-sm">Edit</button></td>
+                            </tr>
+                        `).join('');
+                    } else if (viewName === 'team') {
+                        thead.innerHTML = '<tr><th>Name</th><th>Role</th><th>Department</th><th>Actions</th></tr>';
+                        tbody.innerHTML = App.state.data.team.map(t => `
+                            <tr>
+                                <td>
+                                    <div class="flex items-center gap-1">
+                                        <div style="width:24px;height:24px;border-radius:50%;background:var(--bg-body);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:bold;">${t.name.charAt(0)}</div>
+                                        <div>
+                                            <div style="font-weight:500;">${t.name}</div>
+                                            <div class="text-xs text-muted">${t.email}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="badge badge-info">${t.role}</span></td>
+                                <td>${App.utils.getDeptName(t.deptId)}</td>
+                                <td><button class="btn btn-secondary text-sm" onclick="App.ui.showToast('Demo email invite sent to ${t.email}', 'success')">Invite</button></td>
+                            </tr>
+                        `).join('');
+                    } else {
+                        tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted">Data view for ${viewName} is simulated in this prototype.</td></tr>`;
+                    }
+                }
+            },
+
+            // --- 7. Wizard & Editor Logic ---
+            wizard: {
+                currentStep: 1,
+                totalSteps: 4,
+                init: () => {
+                    App.wizard.currentStep = 1;
+                    const deptSelect = document.getElementById('wiz-dept');
+                    deptSelect.innerHTML = '<option value="">Select Department</option>' + App.state.data.departments.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+                    App.wizard.updateUI();
+                    App.wizard.addStep(); // Add first empty step
+                },
+                updateUI: () => {
+                    // Update content visibility
+                    document.querySelectorAll('.wizard-content').forEach((el, idx) => {
+                        el.classList.toggle('active', idx + 1 === App.wizard.currentStep);
+                    });
+                    
+                    // Generate Header Progress
+                    const steps = ['Basic Info', 'Trigger', 'Steps', 'Generate'];
+                    document.getElementById('wizard-progress').innerHTML = steps.map((s, i) => `
+                        <div class="wizard-step-indicator ${i+1 === App.wizard.currentStep ? 'active' : ''} ${i+1 < App.wizard.currentStep ? 'completed' : ''}">
+                            <div class="step-circle">${i+1 < App.wizard.currentStep ? '<i data-lucide="check" style="width:16px;"></i>' : i+1}</div>
+                            <div class="step-label">${s}</div>
+                        </div>
+                    `).join('');
+                    if(window.lucide) lucide.createIcons();
+
+                    // Buttons
+                    document.getElementById('wiz-prev').style.display = App.wizard.currentStep > 1 ? 'block' : 'none';
+                    if (App.wizard.currentStep === App.wizard.totalSteps) {
+                        document.getElementById('wiz-next').style.display = 'none';
+                        document.getElementById('wiz-generate').style.display = 'block';
+                        App.wizard.prepareSummary();
+                    } else {
+                        document.getElementById('wiz-next').style.display = 'block';
+                        document.getElementById('wiz-generate').style.display = 'none';
+                    }
+                },
+                nextStep: () => {
+                    // Basic validation
+                    if (App.wizard.currentStep === 1) {
+                        if (!document.getElementById('wiz-title').value || !document.getElementById('wiz-dept').value) {
+                            App.ui.showToast('Please fill required fields (Title, Department)', 'error');
+                            return;
+                        }
+                    }
+                    if (App.wizard.currentStep < App.wizard.totalSteps) {
+                        App.wizard.currentStep++;
+                        App.wizard.updateUI();
+                    }
+                },
+                prevStep: () => {
+                    if (App.wizard.currentStep > 1) {
+                        App.wizard.currentStep--;
+                        App.wizard.updateUI();
+                    }
+                },
+                addStep: () => {
+                    const container = document.getElementById('wiz-steps-container');
+                    const stepNum = container.children.length + 1;
+                    const stepDiv = document.createElement('div');
+                    stepDiv.className = 'card process-step-item p-3';
+                    stepDiv.innerHTML = `
+                        <div class="flex justify-between mb-2">
+                            <h4 class="m-0 text-sm">Step ${stepNum}</h4>
+                            <button type="button" class="btn text-danger text-sm bg-transparent border-0" onclick="this.parentElement.parentElement.remove()" style="padding:0;"><i data-lucide="trash-2" style="width:16px;"></i></button>
+                        </div>
+                        <input type="text" class="form-control mb-1 step-title-input" placeholder="Action Title (e.g., Verify Email)">
+                        <textarea class="form-control text-sm step-desc-input" placeholder="Detailed instruction..." style="min-height:60px;"></textarea>
+                    `;
+                    container.appendChild(stepDiv);
+                    if(window.lucide) lucide.createIcons();
+                },
+                prepareSummary: () => {
+                    const title = document.getElementById('wiz-title').value;
+                    const dept = App.utils.getDeptName(document.getElementById('wiz-dept').value);
+                    const steps = document.querySelectorAll('.process-step-item').length;
+                    
+                    document.getElementById('wiz-summary').innerHTML = `
+                        <li style="padding:0.75rem; border-bottom:1px solid var(--border);"><strong>Title:</strong> ${App.utils.escapeHTML(title)}</li>
+                        <li style="padding:0.75rem; border-bottom:1px solid var(--border);"><strong>Department:</strong> ${dept}</li>
+                        <li style="padding:0.75rem;"><strong>Process Steps:</strong> ${steps} defined</li>
+                    `;
+                },
+                generateSOP: () => {
+                    const title = document.getElementById('wiz-title').value;
+                    const deptId = document.getElementById('wiz-dept').value;
+                    const purpose = document.getElementById('wiz-purpose').value;
+                    const trigger = document.getElementById('wiz-trigger').value;
+                    const outcome = document.getElementById('wiz-outcome').value;
+                    
+                    const deptCode = App.state.data.departments.find(d => d.id === deptId)?.code || 'GEN';
+                    const sopNum = `SOP-${deptCode}-${Math.floor(Math.random()*1000).toString().padStart(3, '0')}`;
+                    
+                    let stepsHtml = '';
+                    document.querySelectorAll('.process-step-item').forEach((item, idx) => {
+                        const stitle = item.querySelector('.step-title-input').value || `Step ${idx+1}`;
+                        const sdesc = item.querySelector('.step-desc-input').value || 'No description provided.';
+                        stepsHtml += `<li><strong>${App.utils.escapeHTML(stitle)}</strong><br>${App.utils.escapeHTML(sdesc)}</li>`;
+                    });
+
+                    // Rule-based generation (Simulated AI)
+                    const content = `
+                        <h1>${App.utils.escapeHTML(title)}</h1>
+                        <hr>
+                        <h2>1. Purpose & Scope</h2>
+                        <p>${App.utils.escapeHTML(purpose) || 'To define and standardize this process to ensure consistency and quality.'}</p>
+                        
+                        <h2>2. Triggers & Expected Outcome</h2>
+                        <p><strong>Trigger:</strong> ${App.utils.escapeHTML(trigger) || 'N/A'}</p>
+                        <p><strong>Outcome:</strong> ${App.utils.escapeHTML(outcome) || 'Process completed successfully.'}</p>
+                        
+                        <h2>3. Step-by-Step Procedure</h2>
+                        <ol>${stepsHtml || '<li>Draft steps to be added.</li>'}</ol>
+                        
+                        <div style="background:#FEF3C7; padding:1rem; border-left:4px solid #F59E0B; margin-top:1rem;">
+                            <strong>Note:</strong> This document was generated using rule-based JavaScript processing. Please review and refine.
+                        </div>
+                    `;
+
+                    const newSop = {
+                        id: App.utils.generateId('sop'),
+                        sopNumber: sopNum,
+                        title: title,
+                        departmentId: deptId,
+                        status: 'Draft',
+                        version: '1.0',
+                        lastUpdated: new Date().toISOString(),
+                        content: content
+                    };
+
+                    App.state.data.sops.unshift(newSop);
+                    App.storage.set('sops', App.state.data.sops);
+                    
+                    App.ui.showToast('SOP Generated Successfully!', 'success');
+                    window.location.hash = `#editor?id=${newSop.id}`;
+                }
+            },
+
+            editor: {
+                currentSop: null,
+                init: (queryString) => {
+                    const params = new URLSearchParams(queryString);
+                    const id = params.get('id');
+                    App.editor.currentSop = App.state.data.sops.find(s => s.id === id);
+                    
+                    if (!App.editor.currentSop) {
+                        document.getElementById('editor-canvas').innerHTML = '<h2>SOP Not Found</h2>';
+                        return;
+                    }
+
+                    const sop = App.editor.currentSop;
+                    document.getElementById('editor-status').innerText = sop.status;
+                    document.getElementById('editor-id').innerText = sop.sopNumber || sop.id;
+                    document.getElementById('editor-version').innerText = sop.version || '1.0';
+                    document.getElementById('editor-canvas').innerHTML = sop.content;
+
+                    // Update badge color based on status
+                    const badge = document.getElementById('editor-status');
+                    badge.className = `badge badge-${sop.status === 'Published' ? 'success' : (sop.status === 'Pending' ? 'warning' : 'primary')}`;
+                },
+                execCmd: (cmd) => {
+                    document.execCommand(cmd, false, null);
+                    document.getElementById('editor-canvas').focus();
+                },
+                saveSOP: () => {
+                    if(!App.editor.currentSop) return;
+                    const content = document.getElementById('editor-canvas').innerHTML;
+                    
+                    // Very basic XSS protection for the prototype
+                    // In a real app, this needs rigorous DOMPurify sanitization
+                    if(content.includes('<script>')) {
+                        App.ui.showToast('Scripts are not allowed.', 'error');
+                        return;
+                    }
+
+                    App.editor.currentSop.content = content;
+                    App.editor.currentSop.lastUpdated = new Date().toISOString();
+                    
+                    // Update in global array
+                    const index = App.state.data.sops.findIndex(s => s.id === App.editor.currentSop.id);
+                    if(index > -1) {
+                        App.state.data.sops[index] = App.editor.currentSop;
+                        App.storage.set('sops', App.state.data.sops);
+                        App.ui.showToast('Draft Saved Successfully', 'success');
+                    }
+                },
+                submitApproval: () => {
+                    if(!App.editor.currentSop) return;
+                    App.editor.currentSop.status = 'Pending';
+                    App.editor.saveSOP();
+                    App.ui.showToast('Submitted for Review (Simulated)', 'success');
+                    document.getElementById('editor-status').innerText = 'Pending';
+                    document.getElementById('editor-status').className = 'badge badge-warning';
+                },
+                applyDemoSuggestion: (type) => {
+                    const canvas = document.getElementById('editor-canvas');
+                    let html = '';
+                    if(type === 'improve') {
+                        html = `<br><div style="color:var(--primary); font-style:italic;">[Demo AI: Expanded explanations should be inserted here based on best practices.]</div><br>`;
+                    } else if (type === 'checklist') {
+                        html = `
+                            <br><h3>Quality Checklist</h3>
+                            <ul style="list-style-type: square;">
+                                <li>All fields completed?</li>
+                                <li>Manager notified?</li>
+                                <li>Data entered in CRM?</li>
+                            </ul>
+                        `;
+                    } else if (type === 'risks') {
+                        html = `
+                            <br><h3>Common Risks & Exceptions</h3>
+                            <p><strong>Risk:</strong> System downtime.<br><strong>Action:</strong> Revert to manual paper tracking and update system within 2 hours of recovery.</p>
+                        `;
+                    }
+                    
+                    // Append at cursor or at end
+                    canvas.innerHTML += html;
+                    App.ui.showToast(`Demo suggestion applied. Remember to Save.`, 'info');
+                }
+            }
+        };
+
+        // --- 8. Bootstrapping ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Hook up specific controller mappings
+            App.controllers['create-sop'] = App.wizard.init;
+            App.controllers['editor'] = App.editor.init;
+
+            // Initialize Storage and Seed if needed
+            App.storage.initSeedData();
+            
+            // Start Router
+            App.router.init();
+        });
+
+    </script>
+</body>
+</html>
