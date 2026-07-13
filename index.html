@@ -1,0 +1,1868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Process SOP Maker | Turn Every Process Into a Repeatable System</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* ==========================================================================
+           CSS VARIABLES & DESIGN SYSTEM
+           ========================================================================== */
+        :root {
+            --primary: #4F46E5;
+            --primary-dark: #4338CA;
+            --primary-light: #EEF2FF;
+            --secondary: #7C3AED;
+            --success: #22C55E;
+            --success-light: #DCFCE7;
+            --warning: #F59E0B;
+            --warning-light: #FEF3C7;
+            --danger: #EF4444;
+            --danger-light: #FEE2E2;
+            --info: #0EA5E9;
+            
+            --dark: #0F172A;
+            --bg-body: #F8FAFC;
+            --surface: #FFFFFF;
+            
+            --border: #E2E8F0;
+            --text-primary: #1E293B;
+            --text-secondary: #64748B;
+            --muted: #94A3B8;
+            
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-full: 9999px;
+            
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            
+            --sidebar-width: 260px;
+            --header-height: 64px;
+            --transition: all 0.2s ease-in-out;
+            --font-family: 'Inter', sans-serif;
+        }
+
+        .dark-mode {
+            --bg-body: #0F172A;
+            --surface: #1E293B;
+            --border: #334155;
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --dark: #020617;
+            --primary-light: #312E81;
+        }
+
+        /* ==========================================================================
+           RESET & TYPOGRAPHY
+           ========================================================================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            line-height: 1.5;
+            font-size: 14px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        h1, h2, h3, h4, h5, h6 { color: var(--text-primary); font-weight: 600; margin-bottom: 0.5rem; }
+        h1 { font-size: 2rem; } h2 { font-size: 1.5rem; } h3 { font-size: 1.25rem; }
+        p { margin-bottom: 1rem; color: var(--text-secondary); }
+        a { color: var(--primary); text-decoration: none; transition: var(--transition); }
+        a:hover { color: var(--primary-dark); }
+        ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; color: var(--text-secondary); }
+
+        /* ==========================================================================
+           LAYOUT & UTILITIES
+           ========================================================================== */
+        .app-container { display: flex; height: 100vh; overflow: hidden; }
+        
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--dark);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+            z-index: 100;
+        }
+        .sidebar-brand {
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            padding: 0 1.5rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-brand svg { margin-right: 0.5rem; color: var(--primary); }
+        .sidebar-nav { flex: 1; overflow-y: auto; padding: 1rem 0; }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: #CBD5E1;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        .nav-item svg { margin-right: 0.75rem; width: 18px; height: 18px; }
+        .nav-item:hover, .nav-item.active {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            border-left: 3px solid var(--primary);
+        }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .top-header {
+            height: var(--header-height);
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            z-index: 50;
+        }
+        .header-search { display: flex; align-items: center; background: var(--bg-body); padding: 0.5rem 1rem; border-radius: var(--radius-md); width: 300px; }
+        .header-search input { border: none; background: transparent; outline: none; margin-left: 0.5rem; width: 100%; color: var(--text-primary); }
+        .header-actions { display: flex; align-items: center; gap: 1rem; }
+        .icon-btn { background: none; border: none; cursor: pointer; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; padding: 0.5rem; border-radius: var(--radius-md); transition: var(--transition); }
+        .icon-btn:hover { background-color: var(--bg-body); color: var(--text-primary); }
+        
+        .page-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        .flex { display: flex; }
+        .flex-col { display: flex; flex-direction: column; }
+        .flex-wrap { flex-wrap: wrap; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; }
+        .justify-end { justify-content: flex-end; }
+        .gap-1 { gap: 0.5rem; }
+        .gap-2 { gap: 1rem; }
+        .gap-4 { gap: 2rem; }
+        .grid { display: grid; }
+        .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+        .grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+        .mt-1 { margin-top: 0.5rem; } .mt-2 { margin-top: 1rem; } .mt-4 { margin-top: 2rem; }
+        .mb-1 { margin-bottom: 0.5rem; } .mb-2 { margin-bottom: 1rem; } .mb-4 { margin-bottom: 2rem; }
+        .p-2 { padding: 1rem; } .p-4 { padding: 2rem; }
+        .w-full { width: 100%; }
+        .text-center { text-align: center; }
+        .text-sm { font-size: 0.875rem; }
+        .text-xs { font-size: 0.75rem; }
+        .text-muted { color: var(--muted); }
+
+        /* ==========================================================================
+           COMPONENTS
+           ========================================================================== */
+        .card {
+            background-color: var(--surface);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+            transition: var(--transition);
+        }
+        .card-hover:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 0.5rem 1rem; font-weight: 500; border-radius: var(--radius-md);
+            cursor: pointer; transition: var(--transition); border: 1px solid transparent;
+            font-size: 0.875rem; gap: 0.5rem; white-space: nowrap;
+        }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-primary:hover { background-color: var(--primary-dark); }
+        .btn-secondary { background-color: var(--surface); border-color: var(--border); color: var(--text-primary); }
+        .btn-secondary:hover { background-color: var(--bg-body); }
+        .btn-danger { background-color: var(--danger); color: white; }
+        .btn-danger:hover { background-color: #DC2626; }
+        .btn-success { background-color: var(--success); color: white; }
+        .btn-success:hover { background-color: #16A34A; }
+        
+        /* Forms */
+        .form-group { margin-bottom: 1.25rem; }
+        .form-label { display: block; font-weight: 500; margin-bottom: 0.5rem; color: var(--text-primary); font-size: 0.875rem; }
+        .form-control {
+            width: 100%; padding: 0.6rem 0.75rem; border: 1px solid var(--border);
+            border-radius: var(--radius-md); font-family: var(--font-family);
+            background-color: var(--surface); color: var(--text-primary); transition: var(--transition);
+        }
+        .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+        textarea.form-control { resize: vertical; min-height: 100px; }
+
+        /* Badges */
+        .badge {
+            display: inline-flex; align-items: center; padding: 0.25rem 0.6rem; border-radius: var(--radius-full);
+            font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .badge-success { background-color: var(--success-light); color: #166534; }
+        .badge-warning { background-color: var(--warning-light); color: #92400E; }
+        .badge-danger { background-color: var(--danger-light); color: #991B1B; }
+        .badge-primary { background-color: var(--primary-light); color: var(--primary-dark); }
+        .badge-info { background-color: #E0F2FE; color: #0369A1; }
+        
+        /* Tables */
+        .table-container { overflow-x: auto; margin-top: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; background-color: var(--surface); }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background-color: var(--bg-body); font-weight: 600; color: var(--text-secondary); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; }
+        tr:hover td { background-color: var(--bg-body); }
+        tr:last-child td { border-bottom: none; }
+
+        /* Toasts */
+        .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast {
+            min-width: 300px; padding: 1rem; border-radius: var(--radius-md);
+            background: white; box-shadow: var(--shadow-lg); border-left: 4px solid var(--primary);
+            display: flex; align-items: start; gap: 10px; transform: translateX(120%);
+            animation: slideIn 0.3s forwards; color: var(--text-primary);
+        }
+        .toast.success { border-color: var(--success); }
+        .toast.warning { border-color: var(--warning); }
+        .toast.error { border-color: var(--danger); }
+        .toast.info { border-color: var(--info); }
+        .toast-icon { flex-shrink: 0; }
+        .toast.success .toast-icon { color: var(--success); }
+        .toast.warning .toast-icon { color: var(--warning); }
+        .toast.error .toast-icon { color: var(--danger); }
+        .toast.info .toast-icon { color: var(--info); }
+        .toast-title { font-weight: 600; font-size: 0.875rem; margin-bottom: 0.25rem; }
+        .toast-msg { font-size: 0.875rem; color: var(--text-secondary); }
+        @keyframes slideIn { to { transform: translateX(0); } }
+        @keyframes slideOut { to { transform: translateX(120%); opacity: 0; } }
+
+        /* Wizards & Editor */
+        .wizard-progress { display: flex; justify-content: space-between; margin-bottom: 2rem; position: relative; }
+        .wizard-progress::before { content: ''; position: absolute; top: 15px; left: 0; right: 0; height: 2px; background: var(--border); z-index: 1; }
+        .wizard-step-indicator { display: flex; flex-direction: column; align-items: center; z-index: 2; width: 100px; }
+        .step-circle { width: 32px; height: 32px; border-radius: 50%; background: var(--surface); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem; transition: var(--transition); }
+        .wizard-step-indicator.active .step-circle { border-color: var(--primary); background: var(--primary); color: white; }
+        .wizard-step-indicator.completed .step-circle { border-color: var(--success); background: var(--success); color: white; }
+        .step-label { font-size: 0.75rem; font-weight: 500; text-align: center; color: var(--text-secondary); }
+        .wizard-step-indicator.active .step-label { color: var(--primary); }
+        
+        .wizard-content { display: none; }
+        .wizard-content.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .editor-layout { display: grid; grid-template-columns: 1fr 300px; gap: 2rem; height: 100%; }
+        .editor-main { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); display: flex; flex-direction: column; }
+        .editor-toolbar { padding: 1rem; border-bottom: 1px solid var(--border); background: var(--bg-body); display: flex; gap: 0.5rem; align-items: center; border-radius: var(--radius-md) var(--radius-md) 0 0; flex-wrap: wrap; }
+        .editor-content { padding: 2rem; flex: 1; overflow-y: auto; outline: none; line-height: 1.6; }
+        .editor-content h2 { margin-top: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+        .ai-sidebar { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1rem; }
+        
+        /* Modals */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+        .modal-overlay.active { display: flex; }
+        .modal { background: var(--surface); width: 100%; max-width: 500px; border-radius: var(--radius-md); box-shadow: var(--shadow-lg); display: flex; flex-direction: column; max-height: 90vh; }
+        .modal-header { padding: 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 1.5rem; overflow-y: auto; }
+        .modal-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 1rem; background: var(--bg-body); border-radius: 0 0 var(--radius-md) var(--radius-md); }
+
+        .demo-badge { background: linear-gradient(45deg, #7C3AED, #4F46E5); color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; vertical-align: top; margin-left: 4px; display: inline-block; }
+        
+        .ai-badge { background: linear-gradient(45deg, #0EA5E9, #22C55E); color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; vertical-align: top; margin-left: 4px; display: inline-block; }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .spin { animation: spin 1s linear infinite; }
+
+        /* Public Landing & Auth */
+        .landing-header { background: var(--surface); padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+        .landing-hero { text-align: center; padding: 6rem 1rem; background: linear-gradient(135deg, var(--bg-body) 0%, #E0E7FF 100%); }
+        .landing-hero h1 { font-size: 3rem; color: var(--dark); max-width: 800px; margin: 0 auto 1.5rem; }
+        .landing-hero p { font-size: 1.25rem; max-width: 600px; margin: 0 auto 2rem; }
+        .landing-section { padding: 5rem 5%; }
+        
+        .auth-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg-body); }
+        .auth-card { width: 100%; max-width: 400px; padding: 2rem; }
+        
+        /* Print Styles */
+        @media print {
+            body { background: white !important; color: black !important; }
+            .sidebar, .top-header, .btn, .ai-sidebar, .toast-container, .modal-overlay, .editor-toolbar { display: none !important; }
+            .app-container { height: auto; overflow: visible; display: block; }
+            .main-content { margin: 0; padding: 0; overflow: visible; display: block; }
+            .page-content { padding: 0; display: block; }
+            .card { border: none; box-shadow: none; padding: 0; }
+            .editor-layout { display: block; }
+            .editor-main { border: none; box-shadow: none; display: block; }
+            .editor-content { padding: 0; outline: none; }
+            @page { margin: 2cm; }
+            h1, h2, h3 { page-break-after: avoid; }
+            table, img { page-break-inside: avoid; }
+            li { page-break-inside: avoid; }
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .editor-layout { grid-template-columns: 1fr; }
+            .grid-cols-4 { grid-template-columns: repeat(2, 1fr); }
+            .grid-cols-3 { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); position: fixed; height: 100vh; }
+            .sidebar.open { transform: translateX(0); }
+            .grid-cols-4, .grid-cols-3, .grid-cols-2 { grid-template-columns: 1fr; }
+            .wizard-step-indicator .step-label { display: none; }
+            .top-header { padding: 0 1rem; }
+            #mobile-menu-btn { display: flex !important; }
+            .header-search { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main Mount Point -->
+    <div id="app"></div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+
+    <!-- Template: Landing Page -->
+    <template id="tmpl-landing">
+        <header class="landing-header">
+            <div class="flex items-center gap-1 font-bold text-lg">
+                <i data-lucide="layers" style="color:var(--primary)"></i> SOP Maker
+            </div>
+            <nav class="flex gap-4 items-center">
+                <a href="#features" class="text-text-secondary">Features</a>
+                <a href="#login" class="text-primary font-medium">Login</a>
+                <a href="#register" class="btn btn-primary">Get Started</a>
+            </nav>
+        </header>
+        <section class="landing-hero">
+            <h1>Create Professional Business SOPs in Minutes</h1>
+            <p>Answer simple questions about your process and turn business knowledge into a clear, repeatable Standard Operating Procedure.</p>
+            <div class="flex justify-center gap-2">
+                <a href="#register" class="btn btn-primary" style="padding: 1rem 2rem; font-size: 1.1rem;">Create Your First SOP</a>
+                <a href="#login" class="btn btn-secondary" style="padding: 1rem 2rem; font-size: 1.1rem;">View Demo</a>
+            </div>
+        </section>
+        <section id="features" class="landing-section" style="background: white;">
+            <div class="text-center mb-4">
+                <h2>Convert Business Knowledge Into Repeatable Systems</h2>
+                <p>Your business should not depend on one person. Document it easily.</p>
+            </div>
+            <div class="grid grid-cols-3 gap-4 max-w-6xl mx-auto" style="max-width: 1000px; margin: 0 auto;">
+                <div class="card text-center">
+                    <i data-lucide="wand-2" class="mb-2" style="width: 32px; height: 32px; color: var(--primary);"></i>
+                    <h3>Guided SOP Builder</h3>
+                    <p class="text-sm">Stop staring at a blank page. Our wizard asks you the right questions.</p>
+                </div>
+                <div class="card text-center">
+                    <i data-lucide="cpu" class="mb-2" style="width: 32px; height: 32px; color: var(--primary);"></i>
+                    <h3>Rule-Based Generator</h3>
+                    <p class="text-sm">Automatically structures your answers into a professional document.</p>
+                </div>
+                <div class="card text-center">
+                    <i data-lucide="users" class="mb-2" style="width: 32px; height: 32px; color: var(--primary);"></i>
+                    <h3>Team Approvals</h3>
+                    <p class="text-sm">Simulated workflows to review, approve and publish procedures.</p>
+                </div>
+            </div>
+        </section>
+        <footer class="landing-header" style="justify-content: center; padding: 2rem;">
+            <p class="text-sm text-muted">© 2026 Business Process SOP Maker Prototype. All rights reserved.</p>
+        </footer>
+    </template>
+
+    <!-- Template: Login -->
+    <template id="tmpl-login">
+        <div class="auth-container">
+            <div class="card auth-card">
+                <div class="text-center mb-4">
+                    <i data-lucide="layers" style="width: 40px; height: 40px; color: var(--primary); margin: 0 auto;"></i>
+                    <h2 class="mt-2">Welcome Back</h2>
+                    <p class="text-sm text-muted">Login to your dashboard</p>
+                </div>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" id="login-email" class="form-control" value="demo@sopmaker.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label flex justify-between">Password <a href="#" onclick="App.ui.showToast('Password reset is simulated.', 'info')" class="text-xs text-primary">Forgot?</a></label>
+                        <input type="password" id="login-password" class="form-control" value="demo123" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-full justify-center mb-2">Login</button>
+                    <button type="button" class="btn btn-secondary w-full justify-center" onclick="App.ui.showToast('Google Login is simulated in this frontend prototype.', 'info')">
+                        <i data-lucide="chrome"></i> Continue with Google <span class="demo-badge">Demo</span>
+                    </button>
+                </form>
+                <p class="text-center mt-4 text-sm">Don't have an account? <a href="#register">Register</a></p>
+                <div class="mt-4 p-2 bg-blue-50 text-xs text-center" style="background: var(--info); color: white; border-radius: var(--radius-sm);">
+                    Demo Credentials:<br>demo@sopmaker.com / demo123
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Template: Register -->
+    <template id="tmpl-register">
+        <div class="auth-container">
+            <div class="card auth-card">
+                <div class="text-center mb-4">
+                    <h2>Create Account</h2>
+                    <p class="text-sm text-muted">Start documenting your processes</p>
+                </div>
+                <form id="register-form">
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" id="reg-name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Business Email</label>
+                        <input type="email" id="reg-email" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" id="reg-password" class="form-control" required minlength="6">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-full justify-center mb-2">Create Account</button>
+                </form>
+                <p class="text-center mt-2 text-xs text-muted">This is a frontend prototype. Production auth requires a backend.</p>
+                <p class="text-center mt-4 text-sm">Already have an account? <a href="#login">Login</a></p>
+            </div>
+        </div>
+    </template>
+
+    <!-- Template: App Layout Shell (Sidebar & Header) -->
+    <template id="tmpl-app-shell">
+        <div class="app-container">
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-brand">
+                    <i data-lucide="layers"></i> SOP Maker
+                </div>
+                <nav class="sidebar-nav">
+                    <a href="#dashboard" class="nav-item" data-path="dashboard"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+                    <a href="#my-sops" class="nav-item" data-path="my-sops"><i data-lucide="file-text"></i> My SOPs</a>
+                    <a href="#create-sop" class="nav-item" data-path="create-sop"><i data-lucide="plus-circle"></i> Create SOP</a>
+                    <a href="#approvals" class="nav-item" data-path="approvals"><i data-lucide="check-square"></i> Approvals</a>
+                    <a href="#templates" class="nav-item" data-path="templates"><i data-lucide="library"></i> Templates</a>
+                    <a href="#departments" class="nav-item" data-path="departments"><i data-lucide="building-2"></i> Departments</a>
+                    <a href="#team" class="nav-item" data-path="team"><i data-lucide="users"></i> Team</a>
+                    <a href="#analytics" class="nav-item" data-path="analytics"><i data-lucide="pie-chart"></i> Analytics</a>
+                    <a href="#settings" class="nav-item" data-path="settings"><i data-lucide="settings"></i> Settings</a>
+                </nav>
+            </aside>
+            <main class="main-content">
+                <header class="top-header">
+                    <div class="flex items-center gap-2">
+                        <button class="icon-btn" id="mobile-menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')" style="display:none;"><i data-lucide="menu"></i></button>
+                        <h2 id="page-title" class="m-0" style="margin:0; font-size:1.25rem;">Dashboard</h2>
+                    </div>
+                    <div class="header-actions">
+                        <button class="icon-btn" onclick="App.ui.toggleDarkMode()" title="Toggle Dark Mode"><i data-lucide="moon"></i></button>
+                        <button class="icon-btn" onclick="App.ui.showToast('Simulated Notifications. Real-time updates require a backend.', 'info')" title="Notifications"><i data-lucide="bell"></i></button>
+                        <div class="flex items-center gap-1 cursor-pointer" onclick="App.auth.logout()" title="Logout">
+                            <div style="width:32px; height:32px; background:var(--primary); color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold;">
+                                <span id="user-initials">KH</span>
+                            </div>
+                            <span class="text-sm font-medium ml-1 hidden md:block">Logout</span>
+                        </div>
+                    </div>
+                </header>
+                <div class="page-content" id="page-content">
+                    <!-- Dynamic View Content Injected Here -->
+                </div>
+            </main>
+        </div>
+    </template>
+
+
+    <!-- Template: Dashboard -->
+    <template id="tmpl-dashboard">
+        <div class="grid grid-cols-4 gap-2 mb-4">
+            <div class="card flex items-center gap-2 card-hover">
+                <div style="padding:1rem; background:var(--primary-light); border-radius:var(--radius-md); color:var(--primary);">
+                    <i data-lucide="file-text"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-muted m-0" style="margin:0">Total SOPs</p>
+                    <h2 class="m-0" id="dash-total-sops" style="margin:0">0</h2>
+                </div>
+            </div>
+            <div class="card flex items-center gap-2 card-hover">
+                <div style="padding:1rem; background:var(--success-light); border-radius:var(--radius-md); color:var(--success);">
+                    <i data-lucide="check-circle"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-muted m-0" style="margin:0">Published</p>
+                    <h2 class="m-0" id="dash-published-sops" style="margin:0">0</h2>
+                </div>
+            </div>
+            <div class="card flex items-center gap-2 card-hover">
+                <div style="padding:1rem; background:var(--warning-light); border-radius:var(--radius-md); color:var(--warning);">
+                    <i data-lucide="clock"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-muted m-0" style="margin:0">Pending Approval</p>
+                    <h2 class="m-0" id="dash-pending-sops" style="margin:0">0</h2>
+                </div>
+            </div>
+            <div class="card flex items-center gap-2 card-hover">
+                <div style="padding:1rem; background:var(--info); color:white; border-radius:var(--radius-md);">
+                    <i data-lucide="users"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-muted m-0" style="margin:0">Team Members</p>
+                    <h2 class="m-0" id="dash-team-count" style="margin:0">0</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-4">
+            <div class="card">
+                <h3>SOPs by Department</h3>
+                <div style="position: relative; height: 250px; width: 100%;">
+                    <canvas id="chart-departments"></canvas>
+                </div>
+            </div>
+            <div class="card">
+                <h3>SOP Status Distribution</h3>
+                <div style="position: relative; height: 250px; width: 100%;">
+                    <canvas id="chart-status"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="flex justify-between items-center mb-2">
+                <h3>Recently Updated SOPs</h3>
+                <a href="#my-sops" class="btn btn-secondary text-sm">View All</a>
+            </div>
+            <div class="table-container">
+                <table id="dash-sops-table">
+                    <thead><tr><th>ID</th><th>Title</th><th>Department</th><th>Status</th><th>Last Updated</th></tr></thead>
+                    <tbody><!-- Populated via JS --></tbody>
+                </table>
+            </div>
+        </div>
+    </template>
+
+    <!-- Template: My SOPs -->
+    <template id="tmpl-my-sops">
+        <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+            <div class="header-search" style="background: var(--surface); border: 1px solid var(--border);">
+                <i data-lucide="search" class="text-muted"></i>
+                <input type="text" id="search-sops" placeholder="Search SOPs by title or ID...">
+            </div>
+            <a href="#create-sop" class="btn btn-primary"><i data-lucide="plus"></i> Create New SOP</a>
+        </div>
+        <div class="card table-container p-0">
+            <table id="sops-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Department</th>
+                        <th>Status</th>
+                        <th>Version</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody><!-- JS injected --></tbody>
+            </table>
+        </div>
+    </template>
+
+    <!-- Template: Create SOP Wizard -->
+    <template id="tmpl-create-sop">
+        <div class="card max-w-4xl mx-auto" style="max-width: 800px; margin: 0 auto;">
+            <div class="wizard-progress" id="wizard-progress">
+                <!-- Steps generated via JS -->
+            </div>
+            
+            <form id="wizard-form">
+                <!-- Step 1: Basic Info -->
+                <div class="wizard-content active" id="step-1">
+                    <h3>Basic Information</h3>
+                    <p class="text-sm text-muted mb-4">Define the core details of this Standard Operating Procedure.</p>
+                    <div class="form-group">
+                        <label class="form-label">SOP Title *</label>
+                        <input type="text" id="wiz-title" class="form-control" required placeholder="e.g., Lead Qualification Process">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="form-group">
+                            <label class="form-label">Department *</label>
+                            <select id="wiz-dept" class="form-control" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Process Owner</label>
+                            <select id="wiz-owner" class="form-control"></select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Purpose of this SOP</label>
+                        <textarea id="wiz-purpose" class="form-control" placeholder="Why does this process exist? What is the main goal?"></textarea>
+                    </div>
+                </div>
+
+                <!-- Step 2: Trigger & Outcome -->
+                <div class="wizard-content" id="step-2">
+                    <h3>Trigger and Outcome</h3>
+                    <p class="text-sm text-muted mb-4">What kicks off this process and what does success look like?</p>
+                    <div class="form-group">
+                        <label class="form-label">What starts this process? (Trigger)</label>
+                        <input type="text" id="wiz-trigger" class="form-control" placeholder="e.g., A new lead fills out the website contact form">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Required Inputs / Pre-requisites</label>
+                        <input type="text" id="wiz-inputs" class="form-control" placeholder="e.g., Customer Name, Email, CRM Access">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Expected Final Result</label>
+                        <input type="text" id="wiz-outcome" class="form-control" placeholder="e.g., Lead is categorized and handed to Account Executive">
+                    </div>
+                </div>
+
+                <!-- Step 3: Steps -->
+                <div class="wizard-content" id="step-3">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3>Process Steps</h3>
+                        <button type="button" class="btn btn-secondary text-sm" onclick="App.wizard.addStep()"><i data-lucide="plus"></i> Add Step</button>
+                    </div>
+                    <p class="text-sm text-muted mb-4">Break down the process into actionable steps. Be as specific as possible.</p>
+                    <div id="wiz-steps-container" class="flex-col gap-2">
+                        <!-- Steps injected here -->
+                    </div>
+                </div>
+
+                <!-- Step 4: Review & Generate -->
+                <div class="wizard-content" id="step-4">
+                    <h3>Review & Generate</h3>
+                    <p class="text-sm text-muted mb-4">Our Gemini AI will construct a professional SOP document from your inputs.</p>
+                    <div class="card bg-gray-50 mb-4" style="background: var(--bg-body);">
+                        <ul id="wiz-summary" style="margin:0; list-style:none; padding:0;"></ul>
+                    </div>
+                    <div class="flex items-center gap-2 text-info mb-4" style="background: #E0F2FE; padding: 1rem; border-radius: var(--radius-md);">
+                        <i data-lucide="sparkles" style="flex-shrink:0; color: #0EA5E9;"></i>
+                        <span class="text-sm" style="color: #0369A1;">Clicking Generate will use Google's Gemini AI to intelligently structure and expand your inputs into a standard SOP format. <span class="ai-badge">AI Powered</span></span>
+                    </div>
+                </div>
+
+                <div class="flex justify-between mt-4 pt-4" style="border-top: 1px solid var(--border);">
+                    <button type="button" class="btn btn-secondary" id="wiz-prev" onclick="App.wizard.prevStep()" style="display:none;">Back</button>
+                    <div style="flex:1"></div>
+                    <button type="button" class="btn btn-primary" id="wiz-next" onclick="App.wizard.nextStep()">Next Step</button>
+                    <button type="button" class="btn btn-success" id="wiz-generate" onclick="App.wizard.generateSOP()" style="display:none;"><i data-lucide="wand-2"></i> Generate SOP</button>
+                </div>
+            </form>
+        </div>
+    </template>
+
+    <!-- Template: SOP Editor -->
+    <template id="tmpl-editor">
+        <div class="editor-layout">
+            <div class="editor-main">
+                <div class="editor-toolbar justify-between">
+                    <div class="flex gap-1 flex-wrap">
+                        <button class="btn btn-secondary text-sm" onclick="App.editor.execCmd('bold')" title="Bold"><b>B</b></button>
+                        <button class="btn btn-secondary text-sm" onclick="App.editor.execCmd('italic')" title="Italic"><i>I</i></button>
+                        <button class="btn btn-secondary text-sm" onclick="App.editor.execCmd('underline')" title="Underline"><u>U</u></button>
+                        <button class="btn btn-secondary text-sm" onclick="App.editor.execCmd('insertUnorderedList')" title="Bullet List"><i data-lucide="list"></i></button>
+                        <button class="btn btn-secondary text-sm" onclick="App.editor.execCmd('insertOrderedList')" title="Number List"><i data-lucide="list-ordered"></i></button>
+                        <div style="width: 1px; background: var(--border); margin: 0 0.5rem;"></div>
+                        <button class="btn btn-secondary text-sm" onclick="App.editor.duplicateSOP()" title="Duplicate"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <div class="flex gap-1">
+                        <button class="btn btn-secondary text-sm" onclick="App.ui.showToast('Please use your browser\'s Print/Save as PDF functionality.', 'info'); setTimeout(()=>window.print(), 1000)"><i data-lucide="printer"></i> Print / PDF</button>
+                        <button class="btn btn-success text-sm" onclick="App.editor.saveSOP()"><i data-lucide="save"></i> Save Draft</button>
+                    </div>
+                </div>
+                <!-- Editable area -->
+                <div class="editor-content" id="editor-canvas" contenteditable="true">
+                    <!-- SOP HTML injected here -->
+                </div>
+            </div>
+            <div class="ai-sidebar flex-col gap-2 print-hide">
+                <h3>SOP Details</h3>
+                <div class="text-sm mb-2 p-3 bg-gray-50 rounded" style="background: var(--bg-body); border-radius: var(--radius-md);">
+                    <div class="flex justify-between mb-1"><strong>Status:</strong> <span id="editor-status" class="badge">Draft</span></div>
+                    <div class="flex justify-between mb-1"><strong>ID:</strong> <span id="editor-id">SOP-...</span></div>
+                    <div class="flex justify-between mb-1"><strong>Version:</strong> <span id="editor-version">1.0</span></div>
+                    <div class="flex justify-between"><strong>Updated:</strong> <span id="editor-updated">-</span></div>
+                </div>
+                
+                <button class="btn btn-primary w-full justify-center mb-1" id="btn-submit-approval" onclick="App.editor.submitApproval()"><i data-lucide="send"></i> Submit for Approval</button>
+                <button class="btn btn-success w-full justify-center" id="btn-publish" onclick="App.editor.publishSOP()" style="display:none;"><i data-lucide="check-circle"></i> Publish SOP</button>
+                
+                <hr style="border:0; border-top: 1px solid var(--border); margin: 1rem 0;">
+                
+                <h3 class="flex items-center gap-1"><i data-lucide="sparkles" style="width:16px; color:#0EA5E9"></i> Gemini AI</h3>
+                <p class="text-xs text-muted mb-2">Enhance your document using AI.</p>
+                <button class="btn btn-secondary w-full text-left text-sm mb-1" id="ai-btn-improve" onclick="App.editor.applyAISuggestion('improve')"><i data-lucide="edit-3" style="width:14px;"></i> Expand Explanations</button>
+                <button class="btn btn-secondary w-full text-left text-sm mb-1" id="ai-btn-checklist" onclick="App.editor.applyAISuggestion('checklist')"><i data-lucide="list-checks" style="width:14px;"></i> Append Quality Checklist</button>
+                <button class="btn btn-secondary w-full text-left text-sm mb-1" id="ai-btn-risks" onclick="App.editor.applyAISuggestion('risks')"><i data-lucide="alert-triangle" style="width:14px;"></i> Add Risks & Exceptions</button>
+                <button class="btn btn-secondary w-full text-left text-sm" id="ai-btn-training" onclick="App.editor.applyAISuggestion('training')"><i data-lucide="help-circle" style="width:14px;"></i> Generate Training Q&A</button>
+            </div>
+        </div>
+    </template>
+
+
+    <!-- Template: Templates Library -->
+    <template id="tmpl-templates">
+        <div class="flex justify-between items-center mb-4">
+            <div>
+                <h2 style="margin:0">SOP Template Library</h2>
+                <p class="text-sm text-muted m-0">Pre-built structures to get you started quickly.</p>
+            </div>
+            <div class="header-search" style="background: var(--surface); border: 1px solid var(--border);">
+                <i data-lucide="search" class="text-muted"></i>
+                <input type="text" id="search-templates" placeholder="Search templates...">
+            </div>
+        </div>
+        <div class="grid grid-cols-3 gap-4" id="templates-grid">
+            <!-- Populated via JS -->
+        </div>
+    </template>
+
+    <!-- Template: Approvals -->
+    <template id="tmpl-approvals">
+        <div class="flex justify-between items-center mb-4">
+            <div>
+                <h2 style="margin:0">Approval Workflow</h2>
+                <p class="text-sm text-muted m-0">Review and manage pending standard operating procedures.</p>
+            </div>
+        </div>
+        <div class="card table-container p-0">
+            <table id="approvals-table">
+                <thead>
+                    <tr>
+                        <th>SOP ID</th>
+                        <th>Title</th>
+                        <th>Submitted By</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody><!-- JS injected --></tbody>
+            </table>
+        </div>
+    </template>
+    
+    <!-- Template: Analytics -->
+    <template id="tmpl-analytics">
+        <div class="flex justify-between items-center mb-4">
+            <h2 style="margin:0">SOP Analytics</h2>
+            <select class="form-control" style="width: auto;" onchange="App.ui.showToast('Time filtering simulated.', 'info')">
+                <option>Last 30 Days</option>
+                <option>Last 90 Days</option>
+                <option>This Year</option>
+                <option>All Time</option>
+            </select>
+        </div>
+        <div class="grid grid-cols-3 gap-4 mb-4">
+            <div class="card text-center">
+                <h3 class="text-muted text-sm uppercase">Documentation Score</h3>
+                <h2 class="text-primary text-3xl mt-2">87%</h2>
+                <p class="text-xs text-success mt-1"><i data-lucide="trending-up" style="width:12px; height:12px; display:inline"></i> +5% from last month</p>
+            </div>
+            <div class="card text-center">
+                <h3 class="text-muted text-sm uppercase">Avg. Approval Time</h3>
+                <h2 class="text-primary text-3xl mt-2">2.4 Days</h2>
+                <p class="text-xs text-success mt-1"><i data-lucide="trending-down" style="width:12px; height:12px; display:inline"></i> -0.5 days from last month</p>
+            </div>
+            <div class="card text-center">
+                <h3 class="text-muted text-sm uppercase">Team Acknowledgement</h3>
+                <h2 class="text-primary text-3xl mt-2">92%</h2>
+                <p class="text-xs text-muted mt-1">Of required training completed</p>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <div class="card">
+                <h3>SOPs by Department (Detailed)</h3>
+                <div style="position: relative; height: 300px; width: 100%;">
+                    <canvas id="chart-analytics-dept"></canvas>
+                </div>
+            </div>
+            <div class="card">
+                <h3>SOP Creation Trend</h3>
+                <div style="position: relative; height: 300px; width: 100%;">
+                    <canvas id="chart-analytics-trend"></canvas>
+                </div>
+            </div>
+        </div>
+    </template>
+    
+    <!-- Template: Settings -->
+    <template id="tmpl-settings">
+        <div class="max-w-4xl mx-auto" style="max-width: 800px;">
+            <h2 class="mb-4">Organization Settings</h2>
+            <div class="card mb-4">
+                <h3 class="mb-4 border-b pb-2">Business Profile</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label class="form-label">Business Name</label>
+                        <input type="text" id="set-bus-name" class="form-control" value="GrowthFlow Solutions">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Industry</label>
+                        <input type="text" id="set-industry" class="form-control" value="Consulting">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Contact Email</label>
+                        <input type="email" class="form-control" value="admin@growthflow.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Default Timezone</label>
+                        <select class="form-control"><option>UTC</option><option selected>Asia/Kolkata</option><option>America/New_York</option></select>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="App.ui.showToast('Settings saved locally', 'success')">Save Profile</button>
+            </div>
+            
+            <div class="card">
+                <h3 class="mb-4 border-b pb-2">Preferences & Notifications</h3>
+                <div class="form-group flex justify-between items-center mb-4">
+                    <div>
+                        <strong>Email Notifications</strong>
+                        <p class="text-sm text-muted m-0">Receive email alerts for pending approvals (Simulated)</p>
+                    </div>
+                    <input type="checkbox" checked style="width: 20px; height: 20px;">
+                </div>
+                <div class="form-group flex justify-between items-center mb-4">
+                    <div>
+                        <strong>Strict Versioning</strong>
+                        <p class="text-sm text-muted m-0">Require approval for every minor edit</p>
+                    </div>
+                    <input type="checkbox" style="width: 20px; height: 20px;">
+                </div>
+                <button class="btn btn-primary" onclick="App.ui.showToast('Preferences updated', 'success')">Update Preferences</button>
+            </div>
+        </div>
+    </template>
+
+    <!-- Template: Generic view for basic CRUD (Departments, Team) -->
+    <template id="tmpl-generic-table">
+        <div class="flex justify-between items-center mb-4">
+            <h2 id="view-title" style="margin:0">Title</h2>
+            <button class="btn btn-primary" id="view-action-btn"><i data-lucide="plus"></i> Add New</button>
+        </div>
+        <div class="card table-container p-0">
+            <table id="generic-table">
+                <thead id="generic-thead"></thead>
+                <tbody id="generic-tbody"></tbody>
+            </table>
+        </div>
+    </template>
+
+
+    <script>
+        /**
+         * Business Process SOP Maker Prototype
+         * Architecture: SPA contained within index.html
+         * Implements LocalStorage database, Hash routing, and simulated backend features.
+         */
+
+        const STORAGE_KEY_PREFIX = 'sopmaker_';
+        const SCHEMA_VERSION = '1.0.0';
+
+        // --- Core Application Namespace ---
+        const App = {
+            state: {
+                user: null,
+                currentPath: '',
+                data: {}
+            },
+            
+            // --- 1. Storage & Data Management ---
+            storage: {
+                get: (key) => {
+                    try { return JSON.parse(localStorage.getItem(STORAGE_KEY_PREFIX + key)); }
+                    catch { return null; }
+                },
+                set: (key, val) => {
+                    localStorage.setItem(STORAGE_KEY_PREFIX + key, JSON.stringify(val));
+                },
+                initSeedData: () => {
+                    const v = App.storage.get('schema_version');
+                    if (v !== SCHEMA_VERSION) {
+                        console.log("Initializing Seed Data...");
+                        App.storage.set('schema_version', SCHEMA_VERSION);
+                        
+                        // Seed Business
+                        App.storage.set('business', { id: 'bus_001', name: 'GrowthFlow Solutions', owner: 'Kiran Hajare', industry: 'Consulting' });
+                        
+                        // Seed User
+                        App.storage.set('user', { id: 'user_001', fullName: 'Kiran Hajare', email: 'demo@sopmaker.com', role: 'Owner' });
+                        
+                        // Seed Departments
+                        App.storage.set('departments', [
+                            { id: 'dept_sales', name: 'Sales', code: 'SALES', color: '#4F46E5' },
+                            { id: 'dept_hr', name: 'HR', code: 'HR', color: '#22C55E' },
+                            { id: 'dept_ops', name: 'Operations', code: 'OPS', color: '#F59E0B' },
+                            { id: 'dept_cs', name: 'Customer Support', code: 'CS', color: '#0EA5E9' }
+                        ]);
+
+                        // Seed Team
+                        App.storage.set('team', [
+                            { id: 'team_001', name: 'Kiran Hajare', email: 'demo@sopmaker.com', role: 'Owner', deptId: 'dept_ops' },
+                            { id: 'team_002', name: 'Amit Sharma', email: 'amit@sopmaker.com', role: 'Manager', deptId: 'dept_sales' },
+                            { id: 'team_003', name: 'Sarah Connor', email: 'sarah@sopmaker.com', role: 'Specialist', deptId: 'dept_hr' }
+                        ]);
+
+                        // Seed SOPs
+                        App.storage.set('sops', [
+                            {
+                                id: 'sop_001', sopNumber: 'SOP-SALES-001', title: 'Lead Qualification Process',
+                                departmentId: 'dept_sales', status: 'Published', version: '1.0',
+                                lastUpdated: new Date(Date.now() - 86400000 * 2).toISOString(), // 2 days ago
+                                content: `<h2>1. Purpose</h2><p>To define the process of qualifying inbound leads to ensure sales team efficiency.</p><h2>2. Steps</h2><ol><li>Review lead info in CRM.</li><li>Call lead within 2 hours of inquiry.</li><li>Ask BANT (Budget, Authority, Need, Timeline) questions.</li><li>Update CRM status to Qualified or Disqualified.</li></ol>`
+                            },
+                            {
+                                id: 'sop_002', sopNumber: 'SOP-HR-001', title: 'Employee Onboarding Phase 1',
+                                departmentId: 'dept_hr', status: 'Pending', version: '0.9',
+                                lastUpdated: new Date(Date.now() - 86400000 * 1).toISOString(), // 1 day ago
+                                content: `<h2>1. Purpose</h2><p>Standardize new hire onboarding for the first week.</p><h2>2. Steps</h2><ol><li>IT Setup and Laptop provisioning.</li><li>Welcome email with login credentials.</li><li>HR Policy overview meeting.</li></ol>`
+                            },
+                            {
+                                id: 'sop_003', sopNumber: 'SOP-OPS-001', title: 'Daily Quality Assurance Check',
+                                departmentId: 'dept_ops', status: 'Draft', version: '1.2',
+                                lastUpdated: new Date().toISOString(),
+                                content: `<h2>1. Purpose</h2><p>Ensure product quality before shipping to clients.</p>`
+                            }
+                        ]);
+                        
+                        // Seed Templates
+                        App.storage.set('templates', [
+                            { id: 'tpl_1', title: 'Sales Call Follow-up', deptId: 'dept_sales', desc: 'Standard procedure for post-call client communication.', steps: 5, time: '10 min' },
+                            { id: 'tpl_2', title: 'Candidate Interview Process', deptId: 'dept_hr', desc: 'End-to-end recruitment screening protocol.', steps: 8, time: '15 min' },
+                            { id: 'tpl_3', title: 'Support Ticket Escalation', deptId: 'dept_cs', desc: 'When and how to escalate technical issues to L2 support.', steps: 4, time: '5 min' },
+                            { id: 'tpl_4', title: 'Monthly Expense Audit', deptId: 'dept_ops', desc: 'Finance operational checklist for end-of-month reconciliations.', steps: 12, time: '30 min' }
+                        ]);
+                    }
+                    // Load into memory
+                    App.state.data = {
+                        sops: App.storage.get('sops') || [],
+                        departments: App.storage.get('departments') || [],
+                        team: App.storage.get('team') || [],
+                        templates: App.storage.get('templates') || []
+                    };
+                }
+            },
+
+            // --- 2. Utilities & Security ---
+            utils: {
+                escapeHTML: (str) => {
+                    if (!str) return '';
+                    return str.toString().replace(/[&<>'"]/g, 
+                        tag => ({
+                            '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+                        }[tag] || tag)
+                    );
+                },
+                generateId: (prefix) => prefix + '_' + Math.random().toString(36).substr(2, 9),
+                formatDate: (iso) => {
+                    if (!iso) return '-';
+                    const d = new Date(iso);
+                    return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                },
+                getDeptName: (id) => {
+                    const d = App.state.data.departments.find(x => x.id === id);
+                    return d ? d.name : 'Unknown';
+                },
+                getDeptColor: (id) => {
+                    const d = App.state.data.departments.find(x => x.id === id);
+                    return d ? d.color : 'var(--primary)';
+                }
+            },
+            
+            // --- AI Integration ---
+            ai: {
+                apiKey: "", // Leave blank, Canvas handles injection
+                
+                // Exponential backoff fetch
+                fetchWithRetry: async (url, options, maxRetries = 3) => {
+                    let retries = 0;
+                    let delay = 1000;
+                    while (retries < maxRetries) {
+                        try {
+                            const response = await fetch(url, options);
+                            if (!response.ok) {
+                                if (response.status === 429) {
+                                    retries++;
+                                    await new Promise(r => setTimeout(r, delay));
+                                    delay *= 2;
+                                    continue;
+                                }
+                                throw new Error(`API Error: ${response.status}`);
+                            }
+                            return await response.json();
+                        } catch (error) {
+                            if (retries === maxRetries - 1) throw error;
+                            retries++;
+                            await new Promise(r => setTimeout(r, delay));
+                            delay *= 2;
+                        }
+                    }
+                },
+
+                generate: async (prompt, systemInstruction = "You are a helpful business operations assistant.") => {
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${App.ai.apiKey}`;
+                    
+                    const payload = {
+                        contents: [{ parts: [{ text: prompt }] }],
+                        systemInstruction: { parts: [{ text: systemInstruction }] }
+                    };
+
+                    try {
+                        const result = await App.ai.fetchWithRetry(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+
+                        const candidate = result.candidates?.[0];
+                        if (candidate && candidate.content?.parts?.[0]?.text) {
+                            // Strip markdown code fences if the model wraps the HTML
+                            let text = candidate.content.parts[0].text;
+                            text = text.replace(/^```html\n?/, '').replace(/^```\n?/, '').replace(/\n?```$/, '');
+                            return text;
+                        }
+                        throw new Error("No content generated");
+                    } catch (error) {
+                        console.error("AI Generation Error", error);
+                        App.ui.showToast("Failed to connect to AI. Please try again.", "error");
+                        return null;
+                    }
+                }
+            },
+
+            // --- 3. UI Components ---
+            ui: {
+                showToast: (msg, type = 'success') => {
+                    const container = document.getElementById('toast-container');
+                    if (!container) return;
+                    const toast = document.createElement('div');
+                    toast.className = `toast ${type}`;
+                    
+                    let icon = 'check-circle';
+                    if(type === 'warning') icon = 'alert-triangle';
+                    if(type === 'error' || type === 'danger') icon = 'x-circle';
+                    if(type === 'info') icon = 'info';
+
+                    toast.innerHTML = `
+                        <div class="toast-icon"><i data-lucide="${icon}"></i></div>
+                        <div>
+                            <div class="toast-title">${type.charAt(0).toUpperCase() + type.slice(1)}</div>
+                            <div class="toast-msg">${App.utils.escapeHTML(msg)}</div>
+                        </div>
+                    `;
+                    container.appendChild(toast);
+                    if(window.lucide) lucide.createIcons({ root: toast });
+                    
+                    setTimeout(() => {
+                        toast.style.animation = 'slideOut 0.3s forwards';
+                        setTimeout(() => toast.remove(), 300);
+                    }, 4000);
+                },
+                toggleDarkMode: () => {
+                    document.body.classList.toggle('dark-mode');
+                    const isDark = document.body.classList.contains('dark-mode');
+                    App.storage.set('dark_mode', isDark);
+                    // Re-render charts if they exist
+                    if(App.charts.instances.dept) App.charts.renderDeptChart();
+                    if(App.charts.instances.status) App.charts.renderStatusChart();
+                    if(App.charts.instances.analyticsDept) App.charts.renderAnalyticsCharts();
+                },
+                renderIcons: () => {
+                    if(window.lucide) lucide.createIcons();
+                }
+            },
+
+            // --- 4. Auth ---
+            auth: {
+                API_URL: "https://script.google.com/macros/s/AKfycbwxme0GaUwPvkNZLy7mhG6-VsHd8MrJpuDmZ6yLss5ZlD99j4Q_Kc-TIlDviMdYZt9TWQ/exec",
+                
+                check: () => {
+                    App.state.user = App.storage.get('user');
+                    return !!App.state.user;
+                },
+                login: async (e) => {
+                    e.preventDefault();
+                    
+                    const email = document.getElementById('login-email').value;
+                    const pass = document.getElementById('login-password').value;
+                    const btn = e.target.querySelector('button[type="submit"]');
+                    const origText = btn.innerHTML;
+                    
+                    btn.innerHTML = '<i data-lucide="loader-2" class="spin" style="width:16px;"></i> Logging in...';
+                    btn.disabled = true;
+                    if(window.lucide) lucide.createIcons();
+
+                    try {
+                        const res = await fetch(App.auth.API_URL, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                            body: JSON.stringify({ action: 'login', email: email, password: pass })
+                        });
+                        const data = await res.json();
+                        
+                        if(data.status === 'success') {
+                            App.storage.set('user', { id: 'user_' + Date.now(), fullName: data.name, email: email, role: 'Owner' });
+                            App.ui.showToast('Login successful.', 'success');
+                            window.location.hash = '#dashboard';
+                        } else {
+                            App.ui.showToast(data.message, 'error');
+                        }
+                    } catch (error) {
+                        console.error(error);
+                        App.ui.showToast('Server Error. Unable to connect to Google Sheets.', 'error');
+                    } finally {
+                        btn.innerHTML = origText;
+                        btn.disabled = false;
+                        if(window.lucide) lucide.createIcons();
+                    }
+                },
+                logout: () => {
+                    App.storage.set('user', null);
+                    window.location.hash = '#login';
+                }
+            },
+
+            router: {
+                init: () => {
+                    window.addEventListener('hashchange', App.router.handle);
+                    // On initial load
+                    if (!window.location.hash) {
+                        window.location.hash = App.auth.check() ? '#dashboard' : '#login';
+                    } else {
+                        App.router.handle();
+                    }
+                },
+                handle: () => {
+                    const hash = window.location.hash.slice(1) || 'login';
+                    const [path, queryString] = hash.split('?');
+                    
+                    // Route protection
+                    const publicRoutes = ['landing', 'login', 'register'];
+                    if (!publicRoutes.includes(path) && !App.auth.check()) {
+                        window.location.hash = '#login';
+                        return;
+                    }
+
+                    const appDiv = document.getElementById('app');
+                    
+                    // Render Layout Shell if needed
+                    if (!publicRoutes.includes(path)) {
+                        if (!document.getElementById('sidebar')) {
+                            appDiv.innerHTML = document.getElementById('tmpl-app-shell').innerHTML;
+                            const user = App.storage.get('user');
+                            const initials = user && user.fullName ? user.fullName.split(' ').map(n=>n[0]).join('').substring(0,2) : 'KH';
+                            document.getElementById('user-initials').innerText = initials;
+                            
+                            // Apply saved dark mode
+                            if(App.storage.get('dark_mode')) document.body.classList.add('dark-mode');
+                        }
+                        
+                        // Close sidebar on mobile after navigation
+                        const sidebar = document.getElementById('sidebar');
+                        if (sidebar && window.innerWidth < 768) {
+                            sidebar.classList.remove('open');
+                        }
+                        
+                        // Update active nav
+                        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                        const activeNav = document.querySelector(`.nav-item[data-path="${path.split('-')[0]}"]`);
+                        if(activeNav) activeNav.classList.add('active');
+
+                        // Mount View Content
+                        const contentDiv = document.getElementById('page-content');
+                        const tmpl = document.getElementById(`tmpl-${path}`) || document.getElementById('tmpl-generic-table');
+                        if (tmpl) {
+                            contentDiv.innerHTML = tmpl.innerHTML;
+                            // Set Title
+                            const titleEl = document.getElementById('page-title');
+                            if(titleEl) titleEl.innerText = path.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+                            
+                            // Initialize specific view controllers
+                            App.controllers[path] ? App.controllers[path](queryString) : App.controllers.generic(path);
+                        } else {
+                            contentDiv.innerHTML = `<div class="card text-center"><h2 class="text-muted">View Not Found</h2></div>`;
+                        }
+                    } else {
+                        // Public routes (full screen)
+                        const tmpl = document.getElementById(`tmpl-${path}`);
+                        if(tmpl) appDiv.innerHTML = tmpl.innerHTML;
+                        if(path === 'login') document.getElementById('login-form').addEventListener('submit', App.auth.login);
+                        if(path === 'register') {
+                            document.getElementById('register-form').addEventListener('submit', async (e) => {
+                                e.preventDefault();
+                                const name = document.getElementById('reg-name').value;
+                                const email = document.getElementById('reg-email').value;
+                                const pass = document.getElementById('reg-password').value;
+                                
+                                const btn = e.target.querySelector('button[type="submit"]');
+                                const origText = btn.innerHTML;
+                                
+                                btn.innerHTML = '<i data-lucide="loader-2" class="spin" style="width:16px;"></i> Registering...';
+                                btn.disabled = true;
+                                if(window.lucide) lucide.createIcons();
+
+                                try {
+                                    const res = await fetch(App.auth.API_URL, {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                                        body: JSON.stringify({ action: 'register', name: name, email: email, password: pass })
+                                    });
+                                    const data = await res.json();
+                                    
+                                    if(data.status === 'success') {
+                                        // User को लॉगिन पेज पर भेजें (Auto-login हटा दिया गया है)
+                                        App.ui.showToast('Account Created Successfully! Please Login.', 'success');
+                                        window.location.hash = '#login';
+                                        
+                                        // लॉगिन पेज पर ईमेल पहले से भरने के लिए थोड़ी देर बाद सेट करें
+                                        setTimeout(() => {
+                                            const loginEmailInput = document.getElementById('login-email');
+                                            if(loginEmailInput) loginEmailInput.value = email;
+                                        }, 100);
+                                        
+                                    } else {
+                                        App.ui.showToast(data.message, 'error');
+                                    }
+                                } catch (error) {
+                                    console.error(error);
+                                    App.ui.showToast('Server Error. Unable to save data.', 'error');
+                                } finally {
+                                    if (btn) {
+                                        btn.innerHTML = origText;
+                                        btn.disabled = false;
+                                        if(window.lucide) lucide.createIcons();
+                                    }
+                                }
+                            });
+                        }
+                    }
+                    
+                    App.ui.renderIcons();
+                }
+            },
+
+            // --- 5. Chart.js Wrapper ---
+            charts: {
+                instances: { dept: null, status: null, analyticsDept: null, analyticsTrend: null },
+                getColors: () => {
+                    const isDark = document.body.classList.contains('dark-mode');
+                    return { text: isDark ? '#94A3B8' : '#64748B', grid: isDark ? '#334155' : '#E2E8F0' };
+                },
+                renderDeptChart: () => {
+                    const ctx = document.getElementById('chart-departments');
+                    if (!ctx) return;
+                    if (App.charts.instances.dept) App.charts.instances.dept.destroy();
+                    
+                    const depts = App.state.data.departments;
+                    const sops = App.state.data.sops;
+                    const data = depts.map(d => sops.filter(s => s.departmentId === d.id).length);
+                    const colors = App.charts.getColors();
+
+                    App.charts.instances.dept = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: depts.map(d => d.name),
+                            datasets: [{ label: 'SOPs', data: data, backgroundColor: '#4F46E5', borderRadius: 4 }]
+                        },
+                        options: {
+                            responsive: true, maintainAspectRatio: false,
+                            scales: {
+                                y: { beginAtZero: true, grid: { color: colors.grid }, ticks: { color: colors.text, stepSize: 1 } },
+                                x: { grid: { display: false }, ticks: { color: colors.text } }
+                            },
+                            plugins: { legend: { display: false } }
+                        }
+                    });
+                },
+                renderStatusChart: () => {
+                    const ctx = document.getElementById('chart-status');
+                    if (!ctx) return;
+                    if (App.charts.instances.status) App.charts.instances.status.destroy();
+                    
+                    const sops = App.state.data.sops;
+                    const counts = { Draft: 0, Pending: 0, Published: 0 };
+                    sops.forEach(s => { if(counts[s.status] !== undefined) counts[s.status]++; });
+                    
+                    App.charts.instances.status = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Draft', 'Pending', 'Published'],
+                            datasets: [{ data: [counts.Draft, counts.Pending, counts.Published], backgroundColor: ['#94A3B8', '#F59E0B', '#22C55E'], borderWidth: 0 }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: App.charts.getColors().text } } }, cutout: '70%' }
+                    });
+                },
+                renderAnalyticsCharts: () => {
+                    const ctxDept = document.getElementById('chart-analytics-dept');
+                    const ctxTrend = document.getElementById('chart-analytics-trend');
+                    if(!ctxDept || !ctxTrend) return;
+                    
+                    if(App.charts.instances.analyticsDept) App.charts.instances.analyticsDept.destroy();
+                    if(App.charts.instances.analyticsTrend) App.charts.instances.analyticsTrend.destroy();
+
+                    const depts = App.state.data.departments;
+                    const sops = App.state.data.sops;
+                    const data = depts.map(d => sops.filter(s => s.departmentId === d.id).length);
+                    const colors = App.charts.getColors();
+
+                    App.charts.instances.analyticsDept = new Chart(ctxDept, {
+                        type: 'polarArea',
+                        data: {
+                            labels: depts.map(d => d.name),
+                            datasets: [{ data: data, backgroundColor: ['#4F46E5', '#22C55E', '#F59E0B', '#0EA5E9', '#7C3AED'] }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: colors.text } } } }
+                    });
+
+                    App.charts.instances.analyticsTrend = new Chart(ctxTrend, {
+                        type: 'line',
+                        data: {
+                            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                            datasets: [{ label: 'New SOPs', data: [2, 5, 3, 8, 4, sops.length], borderColor: '#4F46E5', tension: 0.4, fill: true, backgroundColor: 'rgba(79, 70, 229, 0.1)' }]
+                        },
+                        options: { 
+                            responsive: true, maintainAspectRatio: false, 
+                            scales: {
+                                y: { grid: { color: colors.grid }, ticks: { color: colors.text } },
+                                x: { grid: { color: colors.grid }, ticks: { color: colors.text } }
+                            },
+                            plugins: { legend: { display: false } } 
+                        }
+                    });
+                }
+            },
+
+            controllers: {
+                dashboard: () => {
+                    const sops = App.state.data.sops;
+                    document.getElementById('dash-total-sops').innerText = sops.length;
+                    document.getElementById('dash-published-sops').innerText = sops.filter(s => s.status === 'Published').length;
+                    document.getElementById('dash-pending-sops').innerText = sops.filter(s => s.status === 'Pending').length;
+                    document.getElementById('dash-team-count').innerText = App.state.data.team.length;
+                    
+                    App.charts.renderDeptChart();
+                    App.charts.renderStatusChart();
+
+                    const tbody = document.querySelector('#dash-sops-table tbody');
+                    // Sort by lastUpdated desc
+                    const sortedSops = [...sops].sort((a,b) => new Date(b.lastUpdated) - new Date(a.lastUpdated));
+                    
+                    tbody.innerHTML = sortedSops.slice(0, 5).map(s => `
+                        <tr>
+                            <td><a href="#editor?id=${s.id}"><b>${s.sopNumber || s.id}</b></a></td>
+                            <td>${App.utils.escapeHTML(s.title)}</td>
+                            <td><span class="badge" style="background:${App.utils.getDeptColor(s.departmentId)}20; color:${App.utils.getDeptColor(s.departmentId)}">${App.utils.getDeptName(s.departmentId)}</span></td>
+                            <td><span class="badge badge-${s.status === 'Published' ? 'success' : (s.status === 'Pending' ? 'warning' : 'primary')}">${s.status}</span></td>
+                            <td class="text-muted text-sm">${App.utils.formatDate(s.lastUpdated)}</td>
+                        </tr>
+                    `).join('');
+                },
+                'my-sops': () => {
+                    const tbody = document.querySelector('#sops-table tbody');
+                    const renderTable = (sopsList) => {
+                        tbody.innerHTML = sopsList.length ? sopsList.map(s => `
+                            <tr>
+                                <td><b>${s.sopNumber || s.id}</b></td>
+                                <td>${App.utils.escapeHTML(s.title)}</td>
+                                <td>${App.utils.getDeptName(s.departmentId)}</td>
+                                <td><span class="badge badge-${s.status === 'Published' ? 'success' : (s.status === 'Pending' ? 'warning' : 'primary')}">${s.status}</span></td>
+                                <td>v${s.version || '1.0'}</td>
+                                <td>
+                                    <div class="flex gap-1">
+                                        <a href="#editor?id=${s.id}" class="btn btn-secondary text-sm" style="padding:0.25rem 0.5rem">Edit</a>
+                                        <button class="btn text-danger text-sm bg-transparent border-0" onclick="App.controllers.deleteSop('${s.id}')" style="padding:0.25rem;"><i data-lucide="trash-2" style="width:16px;"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('') : '<tr><td colspan="6" class="text-center text-muted p-4">No SOPs found. <a href="#create-sop">Create one now</a>.</td></tr>';
+                        if(window.lucide) lucide.createIcons();
+                    };
+                    renderTable(App.state.data.sops);
+
+                    document.getElementById('search-sops').addEventListener('input', (e) => {
+                        const term = e.target.value.toLowerCase();
+                        const filtered = App.state.data.sops.filter(s => s.title.toLowerCase().includes(term) || (s.sopNumber && s.sopNumber.toLowerCase().includes(term)));
+                        renderTable(filtered);
+                    });
+                },
+                deleteSop: (id) => {
+                    if(confirm("Are you sure you want to delete this SOP? This cannot be undone.")) {
+                        App.state.data.sops = App.state.data.sops.filter(s => s.id !== id);
+                        App.storage.set('sops', App.state.data.sops);
+                        App.ui.showToast('SOP Deleted', 'success');
+                        App.controllers['my-sops'](); // Re-render
+                    }
+                },
+                
+                templates: () => {
+                    const grid = document.getElementById('templates-grid');
+                    const renderTemplates = (list) => {
+                        grid.innerHTML = list.length ? list.map(t => `
+                            <div class="card card-hover flex-col justify-between">
+                                <div>
+                                    <span class="badge mb-2" style="background:${App.utils.getDeptColor(t.deptId)}20; color:${App.utils.getDeptColor(t.deptId)}">${App.utils.getDeptName(t.deptId)}</span>
+                                    <h3 class="mb-1">${App.utils.escapeHTML(t.title)}</h3>
+                                    <p class="text-sm text-muted">${App.utils.escapeHTML(t.desc)}</p>
+                                    <div class="flex gap-2 text-xs text-muted mb-4">
+                                        <span class="flex items-center gap-1"><i data-lucide="list-ordered" style="width:12px;"></i> ${t.steps} steps</span>
+                                        <span class="flex items-center gap-1"><i data-lucide="clock" style="width:12px;"></i> ${t.time}</span>
+                                    </div>
+                                </div>
+                                <a href="#create-sop?template=${t.id}" class="btn btn-primary w-full justify-center">Use Template</a>
+                            </div>
+                        `).join('') : '<div class="col-span-3 text-center text-muted p-4">No templates found.</div>';
+                        if(window.lucide) lucide.createIcons();
+                    };
+                    renderTemplates(App.state.data.templates);
+
+                    document.getElementById('search-templates').addEventListener('input', (e) => {
+                        const term = e.target.value.toLowerCase();
+                        const filtered = App.state.data.templates.filter(t => t.title.toLowerCase().includes(term));
+                        renderTemplates(filtered);
+                    });
+                },
+
+                approvals: () => {
+                    const tbody = document.querySelector('#approvals-table tbody');
+                    // Filter only Pending or Published (recently)
+                    const sops = App.state.data.sops.filter(s => s.status === 'Pending' || s.status === 'Published').sort((a,b) => new Date(b.lastUpdated) - new Date(a.lastUpdated));
+                    
+                    tbody.innerHTML = sops.length ? sops.map(s => `
+                        <tr>
+                            <td><a href="#editor?id=${s.id}"><b>${s.sopNumber || s.id}</b></a></td>
+                            <td>${App.utils.escapeHTML(s.title)}</td>
+                            <td>Kiran Hajare (Owner)</td>
+                            <td class="text-sm text-muted">${App.utils.formatDate(s.lastUpdated)}</td>
+                            <td><span class="badge badge-${s.status === 'Published' ? 'success' : 'warning'}">${s.status}</span></td>
+                            <td>
+                                ${s.status === 'Pending' ? `
+                                    <div class="flex gap-1">
+                                        <button class="btn btn-success text-xs" style="padding: 0.25rem 0.5rem" onclick="App.controllers.approveSop('${s.id}')">Approve</button>
+                                        <button class="btn btn-danger text-xs" style="padding: 0.25rem 0.5rem" onclick="App.ui.showToast('Change request simulated.', 'info')">Reject</button>
+                                    </div>
+                                ` : '<span class="text-xs text-muted">No actions needed</span>'}
+                            </td>
+                        </tr>
+                    `).join('') : '<tr><td colspan="6" class="text-center text-muted p-4">No pending approvals.</td></tr>';
+                },
+                
+                approveSop: (id) => {
+                    const sop = App.state.data.sops.find(s => s.id === id);
+                    if(sop) {
+                        sop.status = 'Published';
+                        sop.lastUpdated = new Date().toISOString();
+                        App.storage.set('sops', App.state.data.sops);
+                        App.ui.showToast(`SOP ${sop.sopNumber} Approved and Published!`, 'success');
+                        App.controllers.approvals(); // Re-render
+                    }
+                },
+
+                analytics: () => {
+                    App.charts.renderAnalyticsCharts();
+                },
+
+                generic: (viewName) => {
+                    document.getElementById('view-title').innerText = viewName.charAt(0).toUpperCase() + viewName.slice(1);
+                    document.getElementById('view-action-btn').onclick = () => App.ui.showToast(`Action simulated for ${viewName}. Requires backend.`, 'info');
+                    
+                    const thead = document.getElementById('generic-thead');
+                    const tbody = document.getElementById('generic-tbody');
+                    
+                    if (viewName === 'departments') {
+                        thead.innerHTML = '<tr><th>Name</th><th>Code</th><th>SOPs Count</th><th>Actions</th></tr>';
+                        tbody.innerHTML = App.state.data.departments.map(d => `
+                            <tr>
+                                <td><div class="flex items-center gap-1"><div style="width:12px;height:12px;border-radius:50%;background:${d.color}"></div> <strong>${d.name}</strong></div></td>
+                                <td><span class="badge badge-secondary" style="background:var(--bg-body)">${d.code}</span></td>
+                                <td>${App.state.data.sops.filter(s => s.departmentId === d.id).length}</td>
+                                <td><button class="btn btn-secondary text-sm" onclick="App.ui.showToast('Edit Department simulated.', 'info')">Edit</button></td>
+                            </tr>
+                        `).join('');
+                    } else if (viewName === 'team') {
+                        thead.innerHTML = '<tr><th>Name</th><th>Role</th><th>Department</th><th>Actions</th></tr>';
+                        tbody.innerHTML = App.state.data.team.map(t => `
+                            <tr>
+                                <td>
+                                    <div class="flex items-center gap-2">
+                                        <div style="width:32px;height:32px;border-radius:50%;background:var(--primary-light);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;">${t.name.split(' ').map(n=>n[0]).join('')}</div>
+                                        <div>
+                                            <div style="font-weight:500;">${t.name}</div>
+                                            <div class="text-xs text-muted">${t.email}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="badge ${t.role==='Owner'?'badge-primary':'badge-info'}">${t.role}</span></td>
+                                <td>${App.utils.getDeptName(t.deptId)}</td>
+                                <td>
+                                    <button class="btn btn-secondary text-sm" onclick="App.ui.showToast('Demo email invite sent to ${t.email}', 'success')">
+                                        <i data-lucide="mail" style="width:14px"></i> Invite
+                                    </button>
+                                </td>
+                            </tr>
+                        `).join('');
+                        if(window.lucide) lucide.createIcons();
+                    } else {
+                        tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted p-4">Data view for ${viewName} is simulated in this prototype.</td></tr>`;
+                    }
+                }
+            },
+
+            // --- 7. Wizard Logic ---
+            wizard: {
+                currentStep: 1,
+                totalSteps: 4,
+                init: (queryString) => {
+                    App.wizard.currentStep = 1;
+                    const deptSelect = document.getElementById('wiz-dept');
+                    deptSelect.innerHTML = '<option value="">Select Department</option>' + App.state.data.departments.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+                    
+                    const ownerSelect = document.getElementById('wiz-owner');
+                    ownerSelect.innerHTML = App.state.data.team.map(t => `<option value="${t.id}">${t.name} (${t.role})</option>`).join('');
+                    
+                    App.wizard.updateUI();
+                    
+                    // Clear previous steps
+                    document.getElementById('wiz-steps-container').innerHTML = '';
+                    
+                    // Check for template pre-fill
+                    const params = new URLSearchParams(queryString);
+                    const tplId = params.get('template');
+                    if(tplId) {
+                        const tpl = App.state.data.templates.find(t => t.id === tplId);
+                        if(tpl) {
+                            document.getElementById('wiz-title').value = tpl.title;
+                            document.getElementById('wiz-dept').value = tpl.deptId;
+                            document.getElementById('wiz-purpose').value = tpl.desc;
+                            App.ui.showToast('Template loaded. Please fill remaining details.', 'info');
+                            // Add some dummy steps based on template
+                            for(let i=0; i<Math.min(tpl.steps, 3); i++) App.wizard.addStep(`Template Step ${i+1}`);
+                        }
+                    } else {
+                        // Reset forms
+                        document.getElementById('wizard-form').reset();
+                        App.wizard.addStep(); // Add first empty step
+                    }
+                },
+                updateUI: () => {
+                    document.querySelectorAll('.wizard-content').forEach((el, idx) => {
+                        el.classList.toggle('active', idx + 1 === App.wizard.currentStep);
+                    });
+                    
+                    const steps = ['Basic Info', 'Trigger', 'Steps', 'Generate'];
+                    document.getElementById('wizard-progress').innerHTML = steps.map((s, i) => `
+                        <div class="wizard-step-indicator ${i+1 === App.wizard.currentStep ? 'active' : ''} ${i+1 < App.wizard.currentStep ? 'completed' : ''}">
+                            <div class="step-circle">${i+1 < App.wizard.currentStep ? '<i data-lucide="check" style="width:16px;"></i>' : i+1}</div>
+                            <div class="step-label">${s}</div>
+                        </div>
+                    `).join('');
+                    if(window.lucide) lucide.createIcons();
+
+                    document.getElementById('wiz-prev').style.display = App.wizard.currentStep > 1 ? 'block' : 'none';
+                    if (App.wizard.currentStep === App.wizard.totalSteps) {
+                        document.getElementById('wiz-next').style.display = 'none';
+                        document.getElementById('wiz-generate').style.display = 'block';
+                        App.wizard.prepareSummary();
+                    } else {
+                        document.getElementById('wiz-next').style.display = 'block';
+                        document.getElementById('wiz-generate').style.display = 'none';
+                    }
+                },
+                nextStep: () => {
+                    // Validation
+                    if (App.wizard.currentStep === 1) {
+                        if (!document.getElementById('wiz-title').value || !document.getElementById('wiz-dept').value) {
+                            App.ui.showToast('Please fill required fields (Title, Department)', 'error');
+                            return;
+                        }
+                    }
+                    if (App.wizard.currentStep < App.wizard.totalSteps) {
+                        App.wizard.currentStep++;
+                        App.wizard.updateUI();
+                    }
+                },
+                prevStep: () => {
+                    if (App.wizard.currentStep > 1) {
+                        App.wizard.currentStep--;
+                        App.wizard.updateUI();
+                    }
+                },
+                addStep: (defaultTitle = '') => {
+                    const container = document.getElementById('wiz-steps-container');
+                    const stepNum = container.children.length + 1;
+                    const stepDiv = document.createElement('div');
+                    stepDiv.className = 'card process-step-item p-3 mb-2 border';
+                    stepDiv.innerHTML = `
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="m-0 text-sm font-bold">Step ${stepNum}</h4>
+                            <button type="button" class="btn text-danger text-sm bg-transparent border-0" onclick="this.parentElement.parentElement.remove()" style="padding:0;"><i data-lucide="trash-2" style="width:16px;"></i></button>
+                        </div>
+                        <input type="text" class="form-control mb-2 step-title-input" placeholder="Action Title (e.g., Verify Email)" value="${defaultTitle}">
+                        <textarea class="form-control text-sm step-desc-input" placeholder="Detailed instruction..." style="min-height:80px;"></textarea>
+                    `;
+                    container.appendChild(stepDiv);
+                    if(window.lucide) lucide.createIcons();
+                },
+                prepareSummary: () => {
+                    const title = document.getElementById('wiz-title').value;
+                    const dept = App.utils.getDeptName(document.getElementById('wiz-dept').value);
+                    const steps = document.querySelectorAll('.process-step-item').length;
+                    
+                    document.getElementById('wiz-summary').innerHTML = `
+                        <li style="padding:0.75rem; border-bottom:1px solid var(--border);"><strong>Title:</strong> ${App.utils.escapeHTML(title)}</li>
+                        <li style="padding:0.75rem; border-bottom:1px solid var(--border);"><strong>Department:</strong> ${dept}</li>
+                        <li style="padding:0.75rem; border-bottom:1px solid var(--border);"><strong>Process Steps:</strong> ${steps} defined</li>
+                        <li style="padding:0.75rem;"><strong>AI Generation:</strong> Ready</li>
+                    `;
+                },
+                generateSOP: async () => {
+                    const btn = document.getElementById('wiz-generate');
+                    const originalBtnContent = btn.innerHTML;
+                    btn.innerHTML = `<i data-lucide="loader-2" class="spin"></i> Generating AI Document...`;
+                    btn.disabled = true;
+                    if(window.lucide) lucide.createIcons();
+
+                    const title = document.getElementById('wiz-title').value;
+                    const deptId = document.getElementById('wiz-dept').value;
+                    const purpose = document.getElementById('wiz-purpose').value;
+                    const trigger = document.getElementById('wiz-trigger').value;
+                    const outcome = document.getElementById('wiz-outcome').value;
+                    const inputs = document.getElementById('wiz-inputs').value;
+                    
+                    const deptCode = App.state.data.departments.find(d => d.id === deptId)?.code || 'GEN';
+                    const sopNum = `SOP-${deptCode}-${Math.floor(Math.random()*1000).toString().padStart(3, '0')}`;
+                    
+                    let stepsText = '';
+                    document.querySelectorAll('.process-step-item').forEach((item, idx) => {
+                        const stitle = item.querySelector('.step-title-input').value || `Step ${idx+1}`;
+                        const sdesc = item.querySelector('.step-desc-input').value || 'No detailed instructions provided.';
+                        stepsText += `Step ${idx+1}: ${stitle}\nDetails: ${sdesc}\n\n`;
+                    });
+
+                    const systemPrompt = `You are an expert Business Operations Manager. Your task is to take the user's high-level notes and expand them into a highly professional, comprehensive, and end-to-end Standard Operating Procedure (SOP).
+                    
+                    CRITICAL INSTRUCTIONS:
+                    1. Output ONLY raw, valid HTML.
+                    2. Do NOT include \`\`\`html markdown fences.
+                    3. Do not include <html>, <head>, or <body> tags. Output only the inner content.
+                    4. Use semantic HTML: <h1> for the title, <h2> for main sections, <ul>, <ol>, <p>, <strong>.
+                    5. EXPAND AND FLESH OUT: Do not just repeat the user's input. Intelligently deduce the full end-to-end process. Add granular sub-steps, industry best practices, required tools, quality assurance checks, and escalation paths that the user might have missed.
+                    6. Include these standard sections: Purpose & Scope, Process Parameters (Triggers, Inputs, Outcomes), Detailed Step-by-Step Procedure (expanded extensively), Quality Assurance & Troubleshooting, and Key Performance Indicators (KPIs).`;
+
+                    const userPrompt = `Please write a comprehensive, end-to-end SOP using the following seed details. Expand upon these basic inputs to create a robust process document:
+                    Title: ${title}
+                    Department: ${App.utils.getDeptName(deptId)}
+                    Purpose: ${purpose || 'Standardize this process for the department.'}
+                    Trigger: ${trigger || 'When this process is required.'}
+                    Inputs/Pre-requisites: ${inputs || 'Standard departmental tools and information.'}
+                    Expected Outcome: ${outcome || 'Process completed successfully and recorded.'}
+                    
+                    Raw Steps provided by user (EXPAND on these significantly, adding micro-steps and missing logical phases):
+                    ${stepsText || 'No specific steps provided. Please generate standard industry steps for this process.'}`;
+
+                    const aiHtml = await App.ai.generate(userPrompt, systemPrompt);
+                    
+                    // Reset button
+                    btn.innerHTML = originalBtnContent;
+                    btn.disabled = false;
+                    if(window.lucide) lucide.createIcons();
+
+                    if (!aiHtml) return; // Error handled inside generator
+
+                    const newSop = {
+                        id: App.utils.generateId('sop'),
+                        sopNumber: sopNum,
+                        title: title,
+                        departmentId: deptId,
+                        status: 'Draft',
+                        version: '1.0',
+                        lastUpdated: new Date().toISOString(),
+                        content: aiHtml
+                    };
+
+                    App.state.data.sops.unshift(newSop);
+                    App.storage.set('sops', App.state.data.sops);
+                    
+                    App.ui.showToast('AI Generated SOP Successfully!', 'success');
+                    window.location.hash = `#editor?id=${newSop.id}`;
+                }
+            },
+
+            // --- 8. Editor Logic ---
+            editor: {
+                currentSop: null,
+                init: (queryString) => {
+                    const params = new URLSearchParams(queryString);
+                    const id = params.get('id');
+                    App.editor.currentSop = App.state.data.sops.find(s => s.id === id);
+                    
+                    if (!App.editor.currentSop) {
+                        document.getElementById('editor-canvas').innerHTML = '<div class="text-center p-4"><h2>SOP Not Found</h2><a href="#my-sops" class="btn btn-primary mt-2">Back to Library</a></div>';
+                        return;
+                    }
+
+                    const sop = App.editor.currentSop;
+                    const badge = document.getElementById('editor-status');
+                    badge.innerText = sop.status;
+                    badge.className = `badge badge-${sop.status === 'Published' ? 'success' : (sop.status === 'Pending' ? 'warning' : 'primary')}`;
+                    
+                    document.getElementById('editor-id').innerText = sop.sopNumber || sop.id;
+                    document.getElementById('editor-version').innerText = 'v' + (sop.version || '1.0');
+                    document.getElementById('editor-updated').innerText = App.utils.formatDate(sop.lastUpdated);
+                    document.getElementById('editor-canvas').innerHTML = sop.content;
+
+                    // Toggle buttons based on status
+                    document.getElementById('btn-submit-approval').style.display = (sop.status === 'Draft' || sop.status === 'Changes Required') ? 'flex' : 'none';
+                    document.getElementById('btn-publish').style.display = (sop.status === 'Pending') ? 'flex' : 'none';
+                },
+                execCmd: (cmd) => {
+                    document.execCommand(cmd, false, null);
+                    document.getElementById('editor-canvas').focus();
+                },
+                saveSOP: () => {
+                    if(!App.editor.currentSop) return;
+                    const content = document.getElementById('editor-canvas').innerHTML;
+                    
+                    // Very basic sanitization guard for the MVP
+                    if(content.includes('<script>') || content.includes('javascript:')) {
+                        App.ui.showToast('Security Error: Scripts are not allowed in SOP content.', 'error');
+                        return;
+                    }
+
+                    App.editor.currentSop.content = content;
+                    App.editor.currentSop.lastUpdated = new Date().toISOString();
+                    
+                    const index = App.state.data.sops.findIndex(s => s.id === App.editor.currentSop.id);
+                    if(index > -1) {
+                        App.state.data.sops[index] = App.editor.currentSop;
+                        App.storage.set('sops', App.state.data.sops);
+                        App.ui.showToast('Draft Saved Successfully', 'success');
+                        document.getElementById('editor-updated').innerText = App.utils.formatDate(App.editor.currentSop.lastUpdated);
+                    }
+                },
+                submitApproval: () => {
+                    if(!App.editor.currentSop) return;
+                    App.editor.currentSop.status = 'Pending';
+                    App.editor.saveSOP();
+                    App.ui.showToast('Submitted for Manager Review (Simulated workflow)', 'success');
+                    App.editor.init(`id=${App.editor.currentSop.id}`); // refresh ui
+                },
+                publishSOP: () => {
+                    if(!App.editor.currentSop) return;
+                    App.editor.currentSop.status = 'Published';
+                    
+                    // Increment version slightly as a demo logic
+                    let v = parseFloat(App.editor.currentSop.version);
+                    if(!isNaN(v)) App.editor.currentSop.version = (Math.floor(v) + 1.0).toFixed(1);
+                    
+                    App.editor.saveSOP();
+                    App.ui.showToast('SOP Published Successfully!', 'success');
+                    App.editor.init(`id=${App.editor.currentSop.id}`); // refresh ui
+                },
+                duplicateSOP: () => {
+                    if(!App.editor.currentSop) return;
+                    const clone = JSON.parse(JSON.stringify(App.editor.currentSop));
+                    clone.id = App.utils.generateId('sop');
+                    clone.sopNumber = clone.sopNumber + '-COPY';
+                    clone.title = clone.title + ' (Copy)';
+                    clone.status = 'Draft';
+                    clone.version = '1.0';
+                    clone.lastUpdated = new Date().toISOString();
+                    
+                    App.state.data.sops.unshift(clone);
+                    App.storage.set('sops', App.state.data.sops);
+                    App.ui.showToast('SOP Duplicated', 'success');
+                    window.location.hash = `#editor?id=${clone.id}`;
+                },
+                applyAISuggestion: async (type) => {
+                    const canvas = document.getElementById('editor-canvas');
+                    const currentContextText = canvas.innerText.substring(0, 3000); // Send up to 3000 chars for context
+
+                    // Button UI loading state
+                    const btnId = `ai-btn-${type}`;
+                    const btn = document.getElementById(btnId);
+                    const originalHtml = btn.innerHTML;
+                    btn.innerHTML = `<i data-lucide="loader-2" class="spin" style="width:14px;"></i> Generating...`;
+                    btn.disabled = true;
+                    if(window.lucide) lucide.createIcons();
+
+                    let userPrompt = "";
+                    let systemInstruction = `You are an expert Operations Assistant. Analyze the provided SOP context and generate the requested addition.
+                    CRITICAL INSTRUCTIONS:
+                    1. Output ONLY valid HTML intended to be appended to the end of an existing document.
+                    2. Do NOT wrap in \`\`\`html markdown.
+                    3. Use <h2> or <h3> for the section header, followed by standard HTML tags.`;
+
+                    if(type === 'improve') {
+                        userPrompt = `Based on the following SOP text, write a brief, professional paragraph expanding on the importance of strict compliance with these steps, and add 2 best-practice recommendations.\n\nSOP Context:\n${currentContextText}`;
+                    } else if (type === 'checklist') {
+                        userPrompt = `Based on the following SOP text, create a "Quality Assurance Checklist" with 3 to 5 actionable Yes/No questions a reviewer should ask to verify the process was done correctly.\n\nSOP Context:\n${currentContextText}`;
+                    } else if (type === 'risks') {
+                        userPrompt = `Based on the following SOP text, create a section called "Common Risks & Exception Handling". Identify 2 potential risks or failure points in this process, and provide a mitigation action for each.\n\nSOP Context:\n${currentContextText}`;
+                    } else if (type === 'training') {
+                        userPrompt = `Based on the following SOP text, create a "Knowledge Check" section containing 3 multiple-choice questions to test an employee's understanding of this process.\n\nSOP Context:\n${currentContextText}`;
+                    }
+
+                    const resultHtml = await App.ai.generate(userPrompt, systemInstruction);
+                    
+                    // Restore button
+                    btn.innerHTML = originalHtml;
+                    btn.disabled = false;
+                    if(window.lucide) lucide.createIcons();
+
+                    if (resultHtml) {
+                        // Append with some spacing
+                        canvas.innerHTML += `<br><br>${resultHtml}`;
+                        App.ui.showToast(`AI suggestion added. Remember to Save Draft.`, 'success');
+                    }
+                }
+            }
+        };
+
+        // --- Bootstrap Application ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Register Controllers
+            App.controllers['create-sop'] = App.wizard.init;
+            App.controllers['editor'] = App.editor.init;
+
+            // Init Storage & Seeding
+            App.storage.initSeedData();
+            
+            // Start Hash Router
+            App.router.init();
+        });
+
+    </script>
+</body>
+</html>
